@@ -55,7 +55,7 @@ export default function SignupPage() {
                             <line x1="17.5" y1="15" x2="9" y2="6.5"></line>
                         </svg>
                     </div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Join Weight<span className="text-[#18A058]">Loss</span>.ai</h1>
+                    <h1 className="text-3xl font-black tracking-tight mb-2"><span className="text-slate-900">Momen</span><span className="text-[#18A058]">tum</span></h1>
                     <p className="text-slate-500 text-sm">Tell us your goal and let AI do the rest.</p>
                 </div>
 
