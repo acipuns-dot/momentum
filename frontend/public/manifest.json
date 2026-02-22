@@ -4,7 +4,7 @@
     "description": "Premium AI-powered fitness and weight loss planner. Burn fat and build momentum.",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#f8fafc",
+    "background_color": "#ffffff",
     "theme_color": "#f97316",
     "orientation": "portrait-primary",
     "icons": [
