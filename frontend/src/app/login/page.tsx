@@ -90,18 +90,11 @@ export default function LoginPage() {
                         </button>
                     </form>
 
-                    {/* Dev helper */}
-                    <div className="mt-6 pt-6 border-t border-slate-100 text-center">
-                        <button onClick={handleDemoLogin} type="button" className="text-sm text-slate-500 font-medium hover:text-slate-900 transition-colors">
-                            Load demo credentials
-                        </button>
-                        <p className="text-[10px] text-slate-400 mt-2">v2026.02 (Light UI)</p>
-                    </div>
                 </div>
 
                 <div className="mt-8 text-center text-sm font-medium text-slate-500">
                     Don't have an account?{" "}
-                    <Link href="/signup" className="text-[#18A058] hover:text-[#138046] transition-colors">
+                    <Link href="/signup" className="text-[#f97316] hover:text-[#c2410c] transition-colors">
                         Sign Up
                     </Link>
                 </div>

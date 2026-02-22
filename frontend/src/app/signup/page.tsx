@@ -99,14 +99,11 @@ export default function SignupPage() {
                         </button>
                     </form>
 
-                    {/* Abstract Decoration */}
-                    <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#18A058]/10 rounded-full blur-2xl z-0 pointer-events-none"></div>
-
                 </div>
 
                 <div className="mt-8 text-center text-sm font-medium text-slate-500">
                     Already have an account?{" "}
-                    <Link href="/login" className="text-[#18A058] hover:text-[#138046] transition-colors">
+                    <Link href="/login" className="text-[#f97316] hover:text-[#c2410c] transition-colors">
                         Sign In
                     </Link>
                 </div>
