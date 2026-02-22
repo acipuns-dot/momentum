@@ -155,22 +155,30 @@ export default function WorkoutLoggerPage() {
                 const pb = getPB();
                 const now = new Date();
 
-                // Fetch the active weekly plan
-                const activePlans = await pb.collection('weekly_plans_db').getFullList({
+                // Fetch all plans for this user, newest first
+                const plans = await pb.collection('weekly_plans_db').getFullList({
                     filter: `user = "${user.id}"`,
-                    sort: '-created',
-                    limit: 1
+                    sort: '-start_date',
                 });
 
-                if (activePlans.length > 0) {
-                    const planData = activePlans[0].plan_data;
-                    const startDate = new Date(activePlans[0].created);
+                const todayDate = new Date();
+                todayDate.setHours(0, 0, 0, 0);
+
+                // Filter in JS to be resilient to missing/null end_date values
+                const currentPlan = plans.find((p: any) => {
+                    const start = new Date(p.start_date);
+                    start.setHours(0, 0, 0, 0);
+                    const end = p.end_date ? new Date(p.end_date) : new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
+                    end.setHours(23, 59, 59, 999);
+                    return todayDate >= start && todayDate <= end;
+                });
+
+                if (currentPlan) {
+                    const planData = currentPlan.plan_data;
+                    const startDate = new Date(currentPlan.start_date);
                     startDate.setHours(0, 0, 0, 0);
 
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-
-                    const diffTime = Math.abs(today.getTime() - startDate.getTime());
+                    const diffTime = Math.abs(todayDate.getTime() - startDate.getTime());
                     const offset = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
                     if (planData.days && planData.days[offset] && planData.days[offset].type === 'workout') {
