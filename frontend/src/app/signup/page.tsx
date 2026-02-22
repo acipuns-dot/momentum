@@ -48,12 +48,8 @@ export default function SignupPage() {
 
                 {/* Brand Header */}
                 <div className="text-center mb-10">
-                    <div className="w-16 h-16 bg-[#18A058] rounded-2xl mx-auto shadow-xl shadow-primary-500/30 mb-6 flex items-center justify-center">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
-                            <line x1="16" y1="8" x2="2" y2="22"></line>
-                            <line x1="17.5" y1="15" x2="9" y2="6.5"></line>
-                        </svg>
+                    <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-3xl overflow-hidden shadow-xl shadow-orange-500/20">
+                        <img src="/icon-192x192.png" alt="Momentum Logo" className="w-full h-full object-cover" />
                     </div>
                     <h1 className="text-3xl font-black tracking-tight mb-2"><span className="text-slate-900">Momen</span><span className="text-[#18A058]">tum</span></h1>
                     <p className="text-slate-500 text-sm">Tell us your goal and let AI do the rest.</p>
