@@ -1,12 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import {
-    ArrowLeft, Play, Pause, StopCircle, Flame, Clock, Activity,
-    MessageSquare, CheckCircle2, Zap, Wind, Bike, Dumbbell,
-    PersonStanding, Timer, ChevronRight, ChevronLeft
-} from 'lucide-react';
+import { ArrowLeft, Play, Pause, StopCircle, Flame, Clock, Activity, MessageSquare, CheckCircle2, Zap, Wind, Bike, Dumbbell, PersonStanding, Timer, ChevronRight, ChevronLeft, ChevronRightIcon, CheckCircle, Info } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
 import { getPB } from '@/lib/pb';
 
@@ -62,13 +59,35 @@ const fmt = (secs: number) => {
     return `${m}:${s}`;
 };
 
+interface Exercise {
+    name: string;
+    durationOrReps: string;
+    sets?: number;
+    gifUrl?: string;
+    isLoadingGif?: boolean;
+}
+
+interface DailyPlan {
+    focusArea: string;
+    exercises: Exercise[];
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function WorkoutLoggerPage() {
     const { user } = useAuth();
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const isPlanMode = searchParams.get('plan') === 'today';
+
     const [logs, setLogs] = useState<LogEntry[]>([]);
     const [selected, setSelected] = useState<ActivityType | null>(null);
-    const [phase, setPhase] = useState<'pick' | 'jump_setup' | 'jump_countdown' | 'active' | 'done'>('pick');
+    const [phase, setPhase] = useState<'pick' | 'jump_setup' | 'jump_countdown' | 'active' | 'done' | 'guided_intro' | 'guided_active'>('pick');
+
+    // --- Guided AI Workout State ---
+    const [dailyPlan, setDailyPlan] = useState<DailyPlan | null>(null);
+    const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
+    const [loadingPlan, setLoadingPlan] = useState(isPlanMode);
 
     // Generic timer
     const [elapsed, setElapsed] = useState(0);
@@ -127,9 +146,110 @@ export default function WorkoutLoggerPage() {
         })();
     }, [user]);
 
+    // --- Fetch AI Plan if ?plan=today ---
+    useEffect(() => {
+        if (!user || !isPlanMode) return;
+
+        const fetchTodayPlan = async () => {
+            try {
+                const pb = getPB();
+                const now = new Date();
+
+                // Fetch the active weekly plan
+                const activePlans = await pb.collection('weekly_plans_db').getFullList({
+                    filter: `user = "${user.id}"`,
+                    sort: '-created',
+                    limit: 1
+                });
+
+                if (activePlans.length > 0) {
+                    const planData = activePlans[0].plan_data;
+                    const startDate = new Date(activePlans[0].created);
+                    startDate.setHours(0, 0, 0, 0);
+
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    const diffTime = Math.abs(today.getTime() - startDate.getTime());
+                    const offset = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (planData.days && planData.days[offset] && planData.days[offset].type === 'workout') {
+                        setDailyPlan({
+                            focusArea: planData.days[offset].focusArea,
+                            exercises: planData.days[offset].exercises.map((e: any) => ({ ...e, isLoadingGif: true, gifUrl: null }))
+                        });
+                        setPhase('guided_intro');
+
+                        // Treat the guided workout as "Strength" or "HIIT" contextually for saving later. Will default to strength to hit the DB structure cleanly.
+                        setSelected(ACTIVITIES.find(a => a.id === 'strength') || null);
+                    } else {
+                        // It's a rest day, or no valid plan for today. Just fallback.
+                        setPhase('pick');
+                    }
+                }
+            } catch (error) {
+                console.error("Failed to load today's plan", error);
+                setPhase('pick');
+            } finally {
+                setLoadingPlan(false);
+            }
+        };
+
+        fetchTodayPlan();
+    }, [user, isPlanMode]);
+
+    // --- Fetch GIF for current exercise ---
+    useEffect(() => {
+        if (phase !== 'guided_active' || !dailyPlan) return;
+
+        const currentExercise = dailyPlan.exercises[currentExerciseIndex];
+        if (currentExercise.gifUrl || !currentExercise.isLoadingGif) return; // Already fetched or attempted
+
+        const fetchGif = async () => {
+            try {
+                // Remove numbers, "Dumbbell", "Barbell" etc to improve search if needed, but the backend is pretty smart
+                const searchName = currentExercise.name.replace(/^[0-9]+x\s*/, '').trim();
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/exercises?name=${encodeURIComponent(searchName)}&limit=1`);
+
+                if (res.ok) {
+                    const data = await res.json();
+
+                    setDailyPlan(prev => {
+                        if (!prev) return prev;
+                        const newExercises = [...prev.exercises];
+                        newExercises[currentExerciseIndex] = {
+                            ...newExercises[currentExerciseIndex],
+                            gifUrl: data.gifUrl,
+                            isLoadingGif: false
+                        };
+                        return { ...prev, exercises: newExercises };
+                    });
+                } else {
+                    setDailyPlan(prev => {
+                        if (!prev) return prev;
+                        const newExercises = [...prev.exercises];
+                        newExercises[currentExerciseIndex].isLoadingGif = false;
+                        return { ...prev, exercises: newExercises };
+                    });
+                }
+            } catch (e) {
+                console.error("Error fetching GIF", e);
+                setDailyPlan(prev => {
+                    if (!prev) return prev;
+                    const newExercises = [...prev.exercises];
+                    newExercises[currentExerciseIndex].isLoadingGif = false;
+                    return { ...prev, exercises: newExercises };
+                });
+            }
+        };
+
+        fetchGif();
+    }, [phase, currentExerciseIndex, dailyPlan]);
+
+
     // Main timer (only when active and running)
     useEffect(() => {
-        if (running && phase === 'active') {
+        if (running && (phase === 'active' || phase === 'guided_active')) {
             intervalRef.current = setInterval(() => setElapsed(e => e + 1), 1000);
         } else {
             if (intervalRef.current) clearInterval(intervalRef.current);
@@ -205,9 +325,31 @@ export default function WorkoutLoggerPage() {
     };
 
     const resetAll = () => {
-        setPhase('pick'); setSelected(null); setElapsed(0);
+        setPhase('pick'); setSelected(null); setElapsed(0); setRunning(false);
         setEffort(7); setNotes(''); setJumpCount(0); setJumpWorkSecs(0);
         setIntervalState('work'); setIntervalElapsed(0); setCurrentRound(1);
+        if (isPlanMode) router.replace('/log'); // Clear query param
+    };
+
+    const startGuidedRoutine = () => {
+        setPhase('guided_active');
+        setElapsed(0);
+        setRunning(true);
+    };
+
+    const nextExercise = () => {
+        if (!dailyPlan) return;
+        if (currentExerciseIndex < dailyPlan.exercises.length - 1) {
+            setCurrentExerciseIndex(prev => prev + 1);
+        } else {
+            stopWorkout();
+        }
+    };
+
+    const prevExercise = () => {
+        if (currentExerciseIndex > 0) {
+            setCurrentExerciseIndex(prev => prev - 1);
+        }
     };
 
     const saveLog = async () => {
@@ -251,9 +393,13 @@ export default function WorkoutLoggerPage() {
             {/* Header */}
             <div className="bg-white px-6 pt-12 pb-5 border-b border-slate-100 shadow-sm sticky top-0 z-10">
                 <div className="flex items-center gap-3 mb-1">
-                    {phase === 'jump_setup' ? (
-                        <button onClick={() => setPhase('pick')} className="text-slate-400 hover:text-slate-700">
+                    {phase === 'jump_setup' || phase === 'guided_intro' ? (
+                        <button onClick={resetAll} className="text-slate-400 hover:text-slate-700">
                             <ChevronLeft size={22} />
+                        </button>
+                    ) : phase === 'guided_active' ? (
+                        <button onClick={() => setRunning(r => !r)} className={`p-2 rounded-full ${running ? 'bg-orange-100 text-orange-500' : 'bg-green-100 text-green-500'}`}>
+                            {running ? <Pause size={16} /> : <Play size={16} />}
                         </button>
                     ) : (
                         <Link href="/" className="text-slate-400 hover:text-slate-700 transition-colors">
@@ -261,23 +407,28 @@ export default function WorkoutLoggerPage() {
                         </Link>
                     )}
                     <h1 className="text-2xl font-extrabold text-slate-900">
-                        {phase === 'jump_setup' ? 'Jump Rope Setup' : 'Activity Logger'}
+                        {phase === 'jump_setup' ? 'Jump Rope Setup' :
+                            phase === 'guided_intro' ? "Today's Routine" :
+                                phase === 'guided_active' ? fmt(elapsed) :
+                                    'Activity Logger'}
                     </h1>
                 </div>
-                <div className="flex gap-3 mt-4">
-                    <div className="flex items-center gap-1.5 bg-orange-50 border border-orange-100 rounded-full px-3 py-1.5">
-                        <Flame size={14} className="text-orange-400" />
-                        <span className="text-xs font-bold text-orange-600">{totalKcal} kcal</span>
+                {phase !== 'guided_active' && phase !== 'guided_intro' && (
+                    <div className="flex gap-3 mt-4">
+                        <div className="flex items-center gap-1.5 bg-orange-50 border border-orange-100 rounded-full px-3 py-1.5">
+                            <Flame size={14} className="text-orange-400" />
+                            <span className="text-xs font-bold text-orange-600">{totalKcal} kcal</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 rounded-full px-3 py-1.5">
+                            <Clock size={14} className="text-blue-400" />
+                            <span className="text-xs font-bold text-blue-600">{totalMins} min</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-primary-50 border border-primary-100 rounded-full px-3 py-1.5">
+                            <Activity size={14} className="text-primary-500" />
+                            <span className="text-xs font-bold text-primary-600">{logs.length} sessions</span>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 rounded-full px-3 py-1.5">
-                        <Clock size={14} className="text-blue-400" />
-                        <span className="text-xs font-bold text-blue-600">{totalMins} min</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-primary-50 border border-primary-100 rounded-full px-3 py-1.5">
-                        <Activity size={14} className="text-primary-500" />
-                        <span className="text-xs font-bold text-primary-600">{logs.length} sessions</span>
-                    </div>
-                </div>
+                )}
             </div>
 
             <div className="px-6 pt-6 space-y-8">
@@ -613,6 +764,130 @@ export default function WorkoutLoggerPage() {
                         </button>
                     </div>
                 )}
+
+                {/* ══ PHASE: GUIDED INTRO ════════════════════════════════════ */}
+                {phase === 'guided_intro' && dailyPlan && (
+                    <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+                        <div className="text-center py-6">
+                            <div className="w-16 h-16 bg-orange-100 text-orange-500 rounded-3xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-inner">
+                                🔥
+                            </div>
+                            <h2 className="text-2xl font-black text-slate-900 leading-tight">{dailyPlan.focusArea}</h2>
+                            <p className="text-sm text-slate-500 font-medium mt-2">{dailyPlan.exercises.length} movements scheduled</p>
+                        </div>
+
+                        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100">
+                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">The Plan</h3>
+                            <div className="space-y-4">
+                                {dailyPlan.exercises.map((ex, idx) => (
+                                    <div key={idx} className="flex items-center gap-4 border-b border-slate-50 pb-4 last:border-0 last:pb-0">
+                                        <div className="w-8 h-8 rounded-xl bg-slate-50 flex flex-shrink-0 items-center justify-center text-xs font-black text-slate-400 border border-slate-100">
+                                            {idx + 1}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-bold text-slate-800 truncate">{ex.name}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm font-black text-[#f97316]">{ex.durationOrReps}</p>
+                                            {ex.sets && <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{ex.sets} sets</p>}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <button onClick={startGuidedRoutine}
+                            className="w-full py-4 bg-[#f97316] hover:bg-orange-600 text-white font-extrabold rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-orange-500/30 text-lg active:scale-95">
+                            <Play size={20} fill="currentColor" /> Let&apos;s Go
+                        </button>
+                    </div>
+                )}
+
+
+                {/* ══ PHASE: GUIDED ACTIVE ══════════════════════════════════ */}
+                {phase === 'guided_active' && dailyPlan && (
+                    <div className="flex flex-col h-full animate-in fade-in duration-300">
+
+                        {/* Progress Bar */}
+                        <div className="w-full bg-slate-200 h-1.5 rounded-full mb-6 overflow-hidden">
+                            <div
+                                className="h-full bg-[#f97316] transition-all duration-500 ease-out"
+                                style={{ width: `${((currentExerciseIndex) / dailyPlan.exercises.length) * 100}%` }}
+                            />
+                        </div>
+
+                        <div className="flex-1 flex flex-col items-center">
+                            <span className="text-xs font-bold text-orange-500 bg-orange-50 px-3 py-1 rounded-full uppercase tracking-widest mb-4">
+                                {currentExerciseIndex + 1} of {dailyPlan.exercises.length}
+                            </span>
+
+                            <h2 className="text-2xl font-black text-slate-900 text-center mb-6 leading-tight px-4 w-full">
+                                {dailyPlan.exercises[currentExerciseIndex].name}
+                            </h2>
+
+                            {/* GIF Display Container */}
+                            <div className="w-full max-w-[280px] aspect-square bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border-4 border-white overflow-hidden relative mb-8 flex items-center justify-center isolate">
+                                {dailyPlan.exercises[currentExerciseIndex].isLoadingGif ? (
+                                    <div className="flex flex-col items-center gap-3 text-slate-400 animate-pulse">
+                                        <Dumbbell size={32} className="opacity-50" />
+                                        <span className="text-xs font-bold uppercase tracking-widest">Loading...</span>
+                                    </div>
+                                ) : dailyPlan.exercises[currentExerciseIndex].gifUrl ? (
+                                    <img
+                                        src={dailyPlan.exercises[currentExerciseIndex].gifUrl}
+                                        alt={dailyPlan.exercises[currentExerciseIndex].name}
+                                        className="w-full h-full object-cover mix-blend-multiply"
+                                    />
+                                ) : (
+                                    <div className="flex flex-col items-center gap-3 text-slate-300">
+                                        <Dumbbell size={48} className="opacity-20" />
+                                        <span className="text-xs font-bold">No Preview Available</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Sets & Reps Card */}
+                            <div className="w-full bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col items-center justify-center mx-6 mb-8 relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-4 opacity-5 text-8xl font-black -translate-y-4 translate-x-4">
+                                    {dailyPlan.exercises[currentExerciseIndex].sets || 1}
+                                </div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 z-10">Target</p>
+                                <span className="text-5xl font-black text-[#f97316] tracking-tighter z-10">
+                                    {dailyPlan.exercises[currentExerciseIndex].durationOrReps}
+                                </span>
+                                {dailyPlan.exercises[currentExerciseIndex].sets && (
+                                    <span className="text-sm font-bold text-slate-600 mt-2 z-10 bg-slate-50 px-4 py-1 rounded-full border border-slate-100">
+                                        {dailyPlan.exercises[currentExerciseIndex].sets} Sets
+                                    </span>
+                                )}
+                            </div>
+
+                        </div>
+
+                        {/* Controls */}
+                        <div className="flex items-center justify-between w-full mt-auto pt-4 gap-3">
+                            <button
+                                onClick={prevExercise}
+                                disabled={currentExerciseIndex === 0}
+                                className="w-14 h-14 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 disabled:opacity-30 active:scale-95 transition-all shadow-sm flex-shrink-0"
+                            >
+                                <ChevronLeft size={24} />
+                            </button>
+
+                            <button
+                                onClick={nextExercise}
+                                className="flex-1 py-4 bg-slate-900 hover:bg-slate-800 text-white font-extrabold rounded-2xl flex items-center justify-center gap-2 transition-transform shadow-xl active:scale-95 text-lg"
+                            >
+                                {currentExerciseIndex === dailyPlan.exercises.length - 1 ? (
+                                    <><CheckCircle size={20} /> Finish Workout</>
+                                ) : (
+                                    <>Next <ChevronRight size={20} /></>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                )}
+
 
             </div>
         </div>

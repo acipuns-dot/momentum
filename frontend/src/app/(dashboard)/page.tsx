@@ -835,7 +835,7 @@ export default function DashboardPage() {
                             <div className="pt-2 border-t border-slate-100 mt-auto">
                                 {isToday ? (
                                     <Link
-                                        href="/log"
+                                        href="/log?plan=today"
                                         className="w-full bg-[#f97316] hover:bg-orange-600 text-white font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-orange-500/30"
                                     >
                                         <span>Start Workout</span>
