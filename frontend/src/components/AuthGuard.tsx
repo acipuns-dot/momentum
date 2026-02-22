@@ -26,6 +26,10 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (loading || isPublic || !user) return;
 
+        // Optimized Bypass: Check localStorage first for instant redirection suppression
+        const isAlreadyOnboarded = typeof window !== 'undefined' && localStorage.getItem('momentum_onboarded') === 'true';
+        if (isAlreadyOnboarded) return;
+
         const checkOnboarding = async () => {
             try {
                 const { getPB } = await import("@/lib/pb");
@@ -36,8 +40,14 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
                 const profile = profiles[0];
                 const needsOnboarding =
                     !profile || !profile.current_weight || profile.current_weight === 0;
-                if (needsOnboarding && !pathname.startsWith("/onboarding")) {
-                    router.push("/onboarding");
+
+                if (needsOnboarding) {
+                    if (!pathname.startsWith("/onboarding")) {
+                        router.push("/onboarding");
+                    }
+                } else {
+                    // Cache the result for next time!
+                    localStorage.setItem('momentum_onboarded', 'true');
                 }
             } catch (e) {
                 console.error("AuthGuard profile check failed", e);

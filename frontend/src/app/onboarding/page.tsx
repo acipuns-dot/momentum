@@ -128,6 +128,7 @@ export default function OnboardingPage() {
             }
 
             // 4. After all weeks succeed, show the success screen
+            localStorage.setItem('momentum_onboarded', 'true');
             setLoading(false);
             setIsSuccess(true);
         } catch (err: any) {
