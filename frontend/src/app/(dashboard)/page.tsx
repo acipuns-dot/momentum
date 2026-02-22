@@ -136,25 +136,36 @@ export default function DashboardPage() {
                 const userProfile = profiles[0];
                 setProfile(userProfile);
 
-                // 2. Fetch the active plan for THIS week from PocketBase
+                // 2. Fetch the active plan from PocketBase
                 let activePlan = null;
                 try {
-                    const todayDateStr = new Date().toISOString();
+                    const todayDate = new Date();
 
+                    // Fetch all plans for this user, newest first
                     const plans = await pb.collection('weekly_plans_db').getFullList({
-                        filter: `user = "${user.id}" && start_date <= "${todayDateStr}" && end_date >= "${todayDateStr}"`,
-                        sort: '-created', // Just in case there's overlap, grab newest
+                        filter: `user = "${user.id}"`,
+                        sort: '-start_date',
                     });
 
-                    if (plans.length > 0) {
+                    // Filter in JS to be resilient to missing/null end_date values
+                    const currentPlan = plans.find(p => {
+                        const start = new Date(p.start_date);
+                        const end = p.end_date ? new Date(p.end_date) : new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
+                        return todayDate >= start && todayDate <= end;
+                    });
+
+                    if (currentPlan) {
+                        activePlan = currentPlan.plan_data;
+                        setPlan(activePlan);
+                        localStorage.setItem('weeklyPlan', JSON.stringify(activePlan));
+                    } else if (plans.length > 0) {
+                        // Fallback: If no "current" plan, just show the most recent one
                         activePlan = plans[0].plan_data;
                         setPlan(activePlan);
-                        // Optional: cache in localStorage so parts of app can read it instantly
                         localStorage.setItem('weeklyPlan', JSON.stringify(activePlan));
-                        setLoadingPlan(false);
                     }
                 } catch (e) {
-                    console.error("No active plan found for today.", e);
+                    console.error("Plan fetch error:", e);
                 }
 
                 // Auto-generate a fallback week 1 plan if NONE exists at all (mostly for old test accounts)
