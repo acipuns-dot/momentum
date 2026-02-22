@@ -10,7 +10,11 @@ export const metadata: Metadata = {
   title: "Momentum",
   description: "AI-Powered Weight Loss & Fitness Training",
   manifest: "/manifest.json",
-  themeColor: "#ffffff",
+  themeColor: "#020617",
+  icons: {
+    icon: "/icon-192x192.png",
+    apple: "/icon-192x192.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
