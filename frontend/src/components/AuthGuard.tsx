@@ -28,7 +28,14 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
         // Optimized Bypass: Check localStorage first for instant redirection suppression
         const isAlreadyOnboarded = typeof window !== 'undefined' && localStorage.getItem('momentum_onboarded') === 'true';
-        if (isAlreadyOnboarded) return;
+        if (isAlreadyOnboarded) {
+            // Guard: If they somehow landed on the /onboarding page (e.g. from an old PWA manifest start_url cache)
+            // and they are already onboarded, force them back to the dashboard.
+            if (pathname.startsWith("/onboarding")) {
+                router.replace("/");
+            }
+            return;
+        }
 
         const checkOnboarding = async () => {
             try {
@@ -43,11 +50,15 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
                 if (needsOnboarding) {
                     if (!pathname.startsWith("/onboarding")) {
-                        router.push("/onboarding");
+                        router.replace("/onboarding");
                     }
                 } else {
                     // Cache the result for next time!
                     localStorage.setItem('momentum_onboarded', 'true');
+                    // Eject from onboarding if they somehow got here
+                    if (pathname.startsWith("/onboarding")) {
+                        router.replace("/");
+                    }
                 }
             } catch (e) {
                 console.error("AuthGuard profile check failed", e);
