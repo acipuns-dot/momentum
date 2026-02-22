@@ -7,10 +7,20 @@ import { z } from 'zod';
 import PocketBase from 'pocketbase';
 
 // Load env vars
+dotenv.config(); // Load from .env if present in current dir
+// Also attempt to load from frontend for local development compatibility
 dotenv.config({ path: '../frontend/.env.local' });
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+
+// Log startup config (masking keys)
+console.log('--- Startup Config ---');
+console.log(`Port: ${PORT}`);
+console.log(`PB URL: ${process.env.NEXT_PUBLIC_POCKETBASE_URL}`);
+console.log(`Anthropic Key set: ${!!process.env.ANTHROPIC_API_KEY}`);
+console.log(`ExerciseDB Key set: ${!!process.env.EXERCIEDB_API_KEY}`);
+console.log('--- end ---');
 
 app.use(cors());
 app.use(express.json());
@@ -111,6 +121,10 @@ CRITICAL CONSTRAINTS:
 3. EXERCISE NAMES: Use standard, recognizable exercise names (e.g. "jump rope").
 4. SCHEDULE: Generate exactly 7 days.
 Based on this, generate the optimal 7-day weight loss plan.`;
+
+        if (!process.env.ANTHROPIC_API_KEY) {
+            return res.status(500).json({ error: 'ANTHROPIC_API_KEY is missing on the server. Please check your Railway environment variables.' });
+        }
 
         const { object: plan } = await generateObject({
             model: anthropic('claude-3-haiku-20240307'),
