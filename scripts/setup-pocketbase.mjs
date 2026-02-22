@@ -12,13 +12,22 @@ import { resolve } from 'path';
 
 // ── Load .env.local ──────────────────────────────────────────────────────────
 function loadEnv() {
-    try {
-        const raw = readFileSync(resolve(process.cwd(), '.env.local'), 'utf-8');
-        for (const line of raw.split('\n')) {
-            const [key, ...rest] = line.split('=');
-            if (key && rest.length) process.env[key.trim()] = rest.join('=').trim();
-        }
-    } catch { /* env.local might not exist */ }
+    const paths = [
+        resolve(process.cwd(), '.env.local'),
+        resolve(process.cwd(), 'frontend', '.env.local')
+    ];
+
+    for (const envPath of paths) {
+        try {
+            const raw = readFileSync(envPath, 'utf-8');
+            for (const line of raw.split('\n')) {
+                const [key, ...rest] = line.split('=');
+                if (key && rest.length) process.env[key.trim()] = rest.join('=').trim();
+            }
+            console.log(`📝 Loaded env from: ${envPath}`);
+            break; // Stop after finding first one
+        } catch { /* Continue to next path */ }
+    }
 }
 loadEnv();
 
@@ -86,6 +95,7 @@ const COLLECTIONS = [
             { name: 'user', type: 'relation', required: true, collectionId: '_pb_users_auth_', maxSelect: 1 },
             { name: 'current_weight', type: 'number', required: true, min: 30, max: 300 },
             { name: 'goal_weight', type: 'number', required: true, min: 30, max: 300 },
+            { name: 'height', type: 'number', required: false, min: 50, max: 250 },
         ],
         listRule: '@request.auth.id != ""',
         viewRule: '@request.auth.id != ""',
@@ -99,6 +109,7 @@ const COLLECTIONS = [
         fields: [
             { name: 'user', type: 'relation', required: true, collectionId: '_pb_users_auth_', maxSelect: 1 },
             { name: 'start_date', type: 'date', required: true },
+            { name: 'end_date', type: 'date', required: false },
             { name: 'plan_data', type: 'json', required: true },
         ],
         listRule: '@request.auth.id = user.id',
@@ -171,6 +182,20 @@ const COLLECTIONS = [
         createRule: null, // admin only
         updateRule: null,
         deleteRule: null,
+    },
+    {
+        name: 'hydration_logs_db',
+        type: 'base',
+        fields: [
+            { name: 'user', type: 'relation', required: true, collectionId: '_pb_users_auth_', maxSelect: 1 },
+            { name: 'date', type: 'text', required: true },
+            { name: 'ml', type: 'number', required: true, min: 0, max: 10000 },
+        ],
+        listRule: '@request.auth.id = user.id',
+        viewRule: '@request.auth.id = user.id',
+        createRule: '@request.auth.id != ""',
+        updateRule: '@request.auth.id = user.id',
+        deleteRule: '@request.auth.id = user.id',
     },
 ];
 
