@@ -64,6 +64,7 @@ interface Exercise {
     durationOrReps: string;
     sets?: number;
     gifUrl?: string;
+    instructions?: string[];
     isLoadingGif?: boolean;
 }
 
@@ -241,7 +242,8 @@ export default function WorkoutLoggerPage() {
                         const newExercises = [...prev.exercises];
                         newExercises[currentExerciseIndex] = {
                             ...newExercises[currentExerciseIndex],
-                            gifUrl: data.gifUrl,
+                            gifUrl: `${baseUrl}/exercise-gif?id=${data.id}`,
+                            instructions: data.instructions,
                             isLoadingGif: false
                         };
                         return { ...prev, exercises: newExercises };
@@ -869,7 +871,7 @@ export default function WorkoutLoggerPage() {
                             </div>
 
                             {/* Sets & Reps Card */}
-                            <div className="w-full bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col items-center justify-center mx-6 mb-8 relative overflow-hidden">
+                            <div className="w-full bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col items-center justify-center mx-6 mb-6 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-4 opacity-5 text-8xl font-black -translate-y-4 translate-x-4">
                                     {dailyPlan.exercises[currentExerciseIndex].sets || 1}
                                 </div>
@@ -883,6 +885,18 @@ export default function WorkoutLoggerPage() {
                                     </span>
                                 )}
                             </div>
+
+                            {/* Instructions Card */}
+                            {dailyPlan.exercises[currentExerciseIndex].instructions && dailyPlan.exercises[currentExerciseIndex].instructions!.length > 0 && (
+                                <div className="w-full mx-6 mb-8 px-6">
+                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 text-center">How to perform</h3>
+                                    <ol className="text-sm text-slate-600 space-y-2 list-decimal list-outside pl-4 text-left font-medium">
+                                        {dailyPlan.exercises[currentExerciseIndex].instructions!.map((step: string, idx: number) => (
+                                            <li key={idx} className="leading-relaxed border-b border-slate-100 pb-2 last:border-0">{step}</li>
+                                        ))}
+                                    </ol>
+                                </div>
+                            )}
 
                         </div>
 
