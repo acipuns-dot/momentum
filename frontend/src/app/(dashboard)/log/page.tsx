@@ -127,9 +127,12 @@ export default function WorkoutLoggerPage() {
             const pb = getPB();
             const today = new Date(); today.setHours(0, 0, 0, 0);
             const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1);
+
+            const todayStr = `${today.toISOString().split('T')[0]} 00:00:00.000Z`;
+            const tomorrowStr = `${tomorrow.toISOString().split('T')[0]} 00:00:00.000Z`;
             try {
                 const records = await pb.collection('activity_logs_db').getFullList({
-                    filter: `user = "${user.id}" && date >= "${today.toISOString()}" && date < "${tomorrow.toISOString()}"`,
+                    filter: `user = "${user.id}" && date >= "${todayStr}" && date < "${tomorrowStr}"`,
                     sort: '-created',
                 });
                 setLogs(records.map(r => {
@@ -217,7 +220,18 @@ export default function WorkoutLoggerPage() {
             try {
                 // Remove numbers, "Dumbbell", "Barbell" etc to improve search if needed, but the backend is pretty smart
                 const searchName = currentExercise.name.replace(/^[0-9]+x\s*/, '').trim();
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/exercises?name=${encodeURIComponent(searchName)}&limit=1`);
+
+                // RapidAPI is very specific. Strip trailing "s" for common plurals to improve match rate.
+                let queryName = searchName.toLowerCase();
+                if (queryName === 'jumping jacks') queryName = 'jumping jack';
+                if (queryName === 'burpees') queryName = 'burpee';
+                if (queryName === 'mountain climbers') queryName = 'mountain climber';
+                if (queryName === 'high knees') queryName = 'high knee';
+
+                const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+                const endpointUrl = `${baseUrl}/exercises?name=${encodeURIComponent(queryName)}&limit=1`;
+
+                const res = await fetch(endpointUrl);
 
                 if (res.ok) {
                     const data = await res.json();
