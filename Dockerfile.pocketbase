@@ -1,21 +1,25 @@
 FROM debian:bookworm-slim
 
-ARG PB_VERSION=0.22.10
-
 RUN apt-get update && apt-get install -y \
-    unzip \
     ca-certificates \
+    unzip \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
-# download and unzip PocketBase
-ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip /tmp/pb.zip
-RUN unzip /tmp/pb.zip -d /pb/ && chmod +x /pb/pocketbase
+# Set PocketBase version
+ARG PB_VERSION=0.22.21
 
-# Create data directory to ensure it exists
+# Download and install PocketBase
+RUN wget https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip -O /tmp/pb.zip \
+    && unzip /tmp/pb.zip -d /usr/local/bin/ \
+    && chmod +x /usr/local/bin/pocketbase \
+    && rm /tmp/pb.zip
+
+# Create the data directory
 RUN mkdir -p /pb_data
 
+# Railway uses $PORT
 EXPOSE 8080
 
-# start PocketBase
-# We use sh -c to expand the $PORT variable provided by Railway
-CMD ["sh", "-c", "/pb/pocketbase serve --http=0.0.0.0:${PORT:-8080} --dir=/pb_data"]
+# Use a shell script approach to be explicit and catch errors
+CMD ["sh", "-c", "echo 'Starting PocketBase on port' ${PORT:-8080}... && pocketbase serve --http=0.0.0.0:${PORT:-8080} --dir=/pb_data"]
