@@ -2,7 +2,7 @@ import express, { type Request, type Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { generateObject } from 'ai';
-import { anthropic } from '@ai-sdk/anthropic';
+import { createAnthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
 import PocketBase from 'pocketbase';
 
@@ -126,8 +126,12 @@ Based on this, generate the optimal 7-day weight loss plan.`;
             return res.status(500).json({ error: 'ANTHROPIC_API_KEY is missing on the server. Please check your Railway environment variables.' });
         }
 
+        const anthropicProvider = createAnthropic({
+            apiKey: process.env.ANTHROPIC_API_KEY,
+        });
+
         const { object: plan } = await generateObject({
-            model: anthropic('claude-3-5-sonnet-20240620'),
+            model: anthropicProvider('claude-3-sonnet-20240229'),
             schema: PlanSchema,
             prompt: aiPrompt,
         });
