@@ -146,8 +146,19 @@ Based on this, generate the optimal 7-day weight loss plan.`;
         return res.json(plan);
 
     } catch (error: any) {
-        console.error('Plan Generation Error:', error);
-        return res.status(500).json({ error: `[${error?.name || 'Error'}] ${error?.message || ''}` });
+        console.error('Plan Generation Error details:', {
+            name: error?.name,
+            message: error?.message,
+            statusCode: error?.statusCode,
+            data: error?.data, // For some SDK versions
+            responseBody: error?.responseBody // For Vercel AI SDK
+        });
+
+        const detailedError = error?.responseBody || error?.message || 'Unknown error';
+        return res.status(500).json({
+            error: `[${error?.name || 'Error'}] ${error?.message || ''}`,
+            details: detailedError
+        });
     }
 });
 
