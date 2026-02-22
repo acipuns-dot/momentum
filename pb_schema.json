@@ -11,6 +11,17 @@
                 "presentable": false,
                 "unique": false,
                 "options": {}
+            },
+            {
+                "name": "premium_until",
+                "type": "date",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "min": "",
+                    "max": ""
+                }
             }
         ],
         "indexes": [],

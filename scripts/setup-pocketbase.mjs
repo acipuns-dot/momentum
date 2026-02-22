@@ -119,6 +119,7 @@ const COLLECTIONS = [
         type: 'auth',
         fields: [
             { name: 'is_premium', type: 'bool', required: false },
+            { name: 'premium_until', type: 'date', required: false },
         ],
     },
     {
