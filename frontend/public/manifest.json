@@ -2,7 +2,7 @@
     "name": "Momentum",
     "short_name": "Momentum",
     "description": "Premium AI-powered fitness and weight loss planner. Burn fat and build momentum.",
-    "start_url": "/onboarding",
+    "start_url": "/",
     "display": "standalone",
     "background_color": "#020617",
     "theme_color": "#020617",
