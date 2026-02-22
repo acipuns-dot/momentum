@@ -137,10 +137,14 @@ Based on this, generate the optimal 7-day weight loss plan.`;
         });
 
         try {
+            // Ensure end_date is exactly 7 days after start_date
+            const calculatedEndDate = new Date(planStartDate.getTime());
+            calculatedEndDate.setDate(calculatedEndDate.getDate() + 7);
+
             await pb.collection('weekly_plans_db').create({
                 user: userId,
                 start_date: planStartDate.toISOString(),
-                end_date: new Date(planStartDate.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                end_date: calculatedEndDate.toISOString(),
                 plan_data: plan
             });
         } catch (e) {
@@ -380,6 +384,32 @@ app.get('/exercise-gif', async (req: Request, res: Response): Promise<any> => {
     } catch (err) {
         console.error('[exercise-gif proxy] Error:', err);
         return res.status(500).json({ error: 'Failed to fetch GIF' });
+    }
+});
+
+// --- Diagnostic Helper: Fix missing end_dates ---
+app.get('/admin/fix-database', async (req: Request, res: Response): Promise<any> => {
+    try {
+        const pb = await getAdminPB();
+        const plans = await pb.collection('weekly_plans_db').getFullList({
+            filter: 'end_date = null || end_date = ""'
+        });
+
+        let updated = 0;
+        for (const plan of plans) {
+            const start = new Date(plan.start_date);
+            const end = new Date(start);
+            end.setDate(end.getDate() + 7);
+
+            await pb.collection('weekly_plans_db').update(plan.id, {
+                end_date: end.toISOString()
+            });
+            updated++;
+        }
+
+        return res.json({ success: true, fixed_records: updated });
+    } catch (e: any) {
+        return res.status(500).json({ error: e.message });
     }
 });
 
