@@ -771,14 +771,16 @@ export default function DashboardPage() {
                             <div className="grid grid-cols-2 gap-3">
                                 <button
                                     onClick={() => setIsWaterModalOpen(false)}
-                                    className="py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors outline-none focus:outline-none"
+                                    style={{ WebkitTapHighlightColor: 'transparent', outline: 'none' }}
+                                    className="py-3 rounded-xl font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors border-none outline-none focus:outline-none"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={submitCustomWater}
                                     disabled={!waterInputMl || isNaN(parseInt(waterInputMl))}
-                                    className="py-3 rounded-xl font-bold text-white bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 disabled:pointer-events-none transition-colors shadow-lg shadow-orange-500/30 outline-none focus:outline-none focus:ring-0"
+                                    style={{ WebkitTapHighlightColor: 'transparent', outline: 'none' }}
+                                    className="py-3 rounded-xl font-bold text-white bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 disabled:pointer-events-none transition-colors shadow-lg shadow-orange-500/30 border-none outline-none focus:outline-none focus:ring-0 focus-visible:outline-none"
                                 >
                                     Log It
                                 </button>
