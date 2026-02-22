@@ -108,6 +108,24 @@ app.post('/generate-plan', async (req: Request, res: Response): Promise<any> => 
             equipmentDescription = `The user has access to: ${equipmentList.join(', ')}. Include standard bodyweight exercises as standard.`;
         }
 
+        // 1. Fetch the master list of cached exercise names
+        let validExercises: string[] = [];
+        try {
+            const cacheRecords = await pb.collection('exercise_cache_db').getFullList({
+                fields: 'name'
+            });
+            // The name field in DB currently stores `name:${actualName}` or similar, let's just clean it up 
+            // if we prefixed it "name:..." in the cache script. 
+            // The cache script we wrote uses `name: "name:jump rope"`
+            validExercises = cacheRecords.map((r: any) => r.name.replace(/^name:/, '').trim());
+        } catch (e) {
+            console.error("Failed to fetch exercise whitelist from cache", e);
+        }
+
+        const validExercisesListStr = validExercises.length > 0
+            ? validExercises.join(', ')
+            : 'Generic exercises (e.g., push-up, squat, jump rope)';
+
         const aiPrompt = `You are an elite AI fitness coach.
 Generate a highly personalized ${weekOffset > 0 ? `Week ${weekOffset + 1}` : '7-day'} workout and nutrition plan for a user.
 User Profile:
@@ -118,7 +136,8 @@ User Profile:
 CRITICAL CONSTRAINTS:
 1. NUTRITION: Calculate a safe, progressive daily calorie deficit target.
 2. EQUIPMENT: ${equipmentDescription}
-3. EXERCISE NAMES: Use standard, recognizable exercise names (e.g. "jump rope").
+3. EXERCISE DICTIONARY SELECTION: You MUST ONLY select and prescribe exercises that exist in the following verified list. Do NOT invent exercises, use variations, or prescribe anything not on this comma-separated list:
+[ ${validExercisesListStr} ]
 4. SCHEDULE: Generate exactly 7 days.
 Based on this, generate the optimal 7-day weight loss plan.`;
 
