@@ -1,17 +1,21 @@
-FROM alpine:latest
+FROM debian:bookworm-slim
 
 ARG PB_VERSION=0.22.10
 
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y \
     unzip \
     ca-certificates \
-    libc6-compat
+    && rm -rf /var/lib/apt/lists/*
 
 # download and unzip PocketBase
 ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip /tmp/pb.zip
 RUN unzip /tmp/pb.zip -d /pb/ && chmod +x /pb/pocketbase
 
+# Create data directory to ensure it exists
+RUN mkdir -p /pb_data
+
 EXPOSE 8080
 
 # start PocketBase
-CMD ["/pb/pocketbase", "serve", "--http=0.0.0.0:8080", "--dir=/pb_data"]
+# We use sh -c to expand the $PORT variable provided by Railway
+CMD ["sh", "-c", "/pb/pocketbase serve --http=0.0.0.0:${PORT:-8080} --dir=/pb_data"]
