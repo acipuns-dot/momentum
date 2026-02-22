@@ -778,7 +778,7 @@ export default function DashboardPage() {
                                 <button
                                     onClick={submitCustomWater}
                                     disabled={!waterInputMl || isNaN(parseInt(waterInputMl))}
-                                    className="py-3 rounded-xl font-bold text-white bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 transition-colors shadow-lg shadow-orange-500/30 outline-none focus:outline-none focus:ring-0"
+                                    className="py-3 rounded-xl font-bold text-white bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 disabled:pointer-events-none transition-colors shadow-lg shadow-orange-500/30 outline-none focus:outline-none focus:ring-0"
                                 >
                                     Log It
                                 </button>
