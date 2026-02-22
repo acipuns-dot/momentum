@@ -127,7 +127,7 @@ Based on this, generate the optimal 7-day weight loss plan.`;
         }
 
         const { object: plan } = await generateObject({
-            model: anthropic('claude-3-haiku-20240307'),
+            model: anthropic('claude-3-5-haiku-20241022'),
             schema: PlanSchema,
             prompt: aiPrompt,
         });
