@@ -60,34 +60,67 @@ async function getToken() {
     return data.token;
 }
 
-async function createCollection(token, schema) {
+async function syncCollection(token, schema) {
+    let existing = null;
     try {
-        const existing = await pb(`collections/${schema.name}`, {
+        existing = await pb(`collections/${schema.name}`, {
             headers: { Authorization: token },
         }).catch(() => null);
-
-        if (existing?.id) {
-            console.log(`\n⏭  Skipped  "${schema.name}" (already exists)`);
-            return;
-        }
     } catch (_) { }
 
-    console.log(`\n--- Creating [${schema.name}] ---`);
-    console.log(JSON.stringify(schema, null, 2));
+    if (existing?.id) {
+        console.log(`\n🔄  Checking [${schema.name}] for updates...`);
 
-    const res = await pb('collections', {
-        method: 'POST',
-        headers: { Authorization: token },
-        body: JSON.stringify(schema),
-    });
+        // Use the existing fields/schema as a base
+        const currentSchema = existing.schema || [];
+        let modified = false;
 
-    if (res.code) throw new Error(res.message);
+        // Check each field in our local definition
+        for (const localField of (schema.fields || [])) {
+            const hasField = currentSchema.some(f => f.name === localField.name);
+            if (!hasField) {
+                console.log(`  ➕  Adding field: ${localField.name}`);
+                currentSchema.push(localField);
+                modified = true;
+            }
+        }
 
-    console.log(`✅  Created  "${schema.name}"`);
+        if (modified) {
+            await pb(`collections/${existing.id}`, {
+                method: 'PATCH',
+                headers: { Authorization: token },
+                body: JSON.stringify({ schema: currentSchema }),
+            });
+            console.log(`✅  Updated "${schema.name}" successfully.`);
+        } else {
+            console.log(`✅  "${schema.name}" is already up to date.`);
+        }
+    } else {
+        console.log(`\n--- Creating [${schema.name}] ---`);
+        // For new collections, PB expects 'schema' not 'fields'
+        const newCol = {
+            ...schema,
+            schema: schema.fields,
+            fields: undefined
+        };
+        await pb('collections', {
+            method: 'POST',
+            headers: { Authorization: token },
+            body: JSON.stringify(newCol),
+        });
+        console.log(`✅  Created "${schema.name}" successfully.`);
+    }
 }
 
 // ── Collection Schemas ───────────────────────────────────────────────────────
 const COLLECTIONS = [
+    {
+        name: 'users',
+        type: 'auth',
+        fields: [
+            { name: 'is_premium', type: 'bool', required: false },
+        ],
+    },
     {
         name: 'profiles_db',
         type: 'base',
@@ -212,7 +245,7 @@ const COLLECTIONS = [
     }
 
     for (const col of COLLECTIONS) {
-        await createCollection(token, col).catch(e =>
+        await syncCollection(token, col).catch(e =>
             console.error(`❌  Failed "${col.name}": ${e.message}`)
         );
     }
