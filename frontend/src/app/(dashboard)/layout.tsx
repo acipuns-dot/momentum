@@ -25,7 +25,7 @@ export default function DashboardLayout({
     };
 
     return (
-        <div className="relative min-h-screen pb-32 bg-[#f8f9fa] dot-grid-subtle max-w-md mx-auto overflow-hidden shadow-2xl shadow-slate-200/50">
+        <div className="relative min-h-screen pb-[calc(7rem+env(safe-area-inset-bottom))] bg-[#f8f9fa] dot-grid-subtle max-w-md mx-auto overflow-hidden shadow-2xl shadow-slate-200/50">
             {children}
 
             {/* ── FAB Choice Bottom Sheet ───────────────────────────────── */}
@@ -87,8 +87,8 @@ export default function DashboardLayout({
             )}
 
             {/* ── Bottom Navigation ─────────────────────────────────────── */}
-            <nav className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-slate-100/60 z-50 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.1)] h-[80px] rounded-t-[2rem]">
-                <div className="flex justify-between items-center h-full px-8 max-w-md mx-auto relative">
+            <nav className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-slate-100/60 z-50 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.1)] rounded-t-[2rem] h-[calc(80px+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)]">
+                <div className="flex justify-between items-center h-[80px] px-8 max-w-md mx-auto relative">
 
                     <Link href="/" className={`flex flex-col items-center justify-center w-[50px] h-full transition-colors group ${isActive('/') ? 'text-[#f97316]' : 'text-slate-400 hover:text-slate-600'}`}>
                         <Home size={24} className={`mb-1 ${isActive('/') ? 'fill-current' : 'group-hover:scale-110 transition-transform'}`} strokeWidth={isActive('/') ? 2.5 : 2} />
