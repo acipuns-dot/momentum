@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Play, Pause, StopCircle, Flame, Clock, Activity, MessageSquare, CheckCircle2, Zap, Wind, Bike, Dumbbell, PersonStanding, Timer, ChevronRight, ChevronLeft, ChevronRightIcon, CheckCircle, Info } from 'lucide-react';
+import { ArrowLeft, Play, Pause, StopCircle, Flame, Clock, Activity, MessageSquare, CheckCircle2, Zap, Wind, Bike, Dumbbell, PersonStanding, Timer, ChevronRight, ChevronLeft, ChevronRightIcon, CheckCircle, Info, Volume2, VolumeX } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth';
@@ -94,6 +94,8 @@ export default function WorkoutLoggerPage() {
     const [elapsed, setElapsed] = useState(0);
     const [running, setRunning] = useState(false);
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const guidedMusicRef = useRef<HTMLAudioElement | null>(null);
+    const [guidedMusicOn, setGuidedMusicOn] = useState(true);
 
     // Post-workout form
     const [effort, setEffort] = useState(7);
@@ -281,6 +283,20 @@ export default function WorkoutLoggerPage() {
         return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
     }, [running, phase]);
 
+    // Guided background music: play only while guided routine is active and running.
+    useEffect(() => {
+        const audio = guidedMusicRef.current;
+        if (!audio) return;
+
+        const shouldPlay = phase === 'guided_active' && running && guidedMusicOn;
+        if (shouldPlay) {
+            audio.volume = 0.3;
+            audio.play().catch(() => { });
+        } else {
+            audio.pause();
+        }
+    }, [phase, running, guidedMusicOn]);
+
     // 15-second countdown timer
     useEffect(() => {
         if (phase !== 'jump_countdown') return;
@@ -343,12 +359,19 @@ export default function WorkoutLoggerPage() {
 
     const stopWorkout = () => {
         setRunning(false);
+        if (guidedMusicRef.current) {
+            guidedMusicRef.current.pause();
+        }
         const estimatedJumps = Math.round((jumpWorkSecs / 60) * sessionType.defaultRpm);
         setJumpCount(estimatedJumps);
         setPhase('done');
     };
 
     const resetAll = () => {
+        if (guidedMusicRef.current) {
+            guidedMusicRef.current.pause();
+            guidedMusicRef.current.currentTime = 0;
+        }
         setPhase('pick'); setSelected(null); setElapsed(0); setRunning(false);
         setEffort(7); setNotes(''); setJumpCount(0); setJumpWorkSecs(0);
         setIntervalState('work'); setIntervalElapsed(0); setCurrentRound(1);
@@ -359,6 +382,11 @@ export default function WorkoutLoggerPage() {
         setPhase('guided_active');
         setElapsed(0);
         setRunning(true);
+        if (guidedMusicOn && guidedMusicRef.current) {
+            guidedMusicRef.current.currentTime = 0;
+            guidedMusicRef.current.volume = 0.3;
+            guidedMusicRef.current.play().catch(() => { });
+        }
     };
 
     const nextExercise = () => {
@@ -422,9 +450,18 @@ export default function WorkoutLoggerPage() {
                             <ChevronLeft size={22} />
                         </button>
                     ) : phase === 'guided_active' ? (
-                        <button onClick={() => setRunning(r => !r)} className={`p-2 rounded-full ${running ? 'bg-orange-100 text-orange-500' : 'bg-green-100 text-green-500'}`}>
-                            {running ? <Pause size={16} /> : <Play size={16} />}
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setGuidedMusicOn(v => !v)}
+                                className={`p-2 rounded-full ${guidedMusicOn ? 'bg-orange-100 text-orange-500' : 'bg-slate-100 text-slate-500'}`}
+                                aria-label={guidedMusicOn ? 'Mute music' : 'Play music'}
+                            >
+                                {guidedMusicOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                            </button>
+                            <button onClick={() => setRunning(r => !r)} className={`p-2 rounded-full ${running ? 'bg-orange-100 text-orange-500' : 'bg-green-100 text-green-500'}`}>
+                                {running ? <Pause size={16} /> : <Play size={16} />}
+                            </button>
+                        </div>
                     ) : (
                         <Link href="/" className="text-slate-400 hover:text-slate-700 transition-colors">
                             <ArrowLeft size={22} />
@@ -926,6 +963,7 @@ export default function WorkoutLoggerPage() {
 
 
             </div>
+            <audio ref={guidedMusicRef} src="/audio/tabata-bg.mp3" loop preload="auto" playsInline />
         </div>
     );
 }
