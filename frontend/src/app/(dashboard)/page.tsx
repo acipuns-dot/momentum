@@ -177,7 +177,10 @@ export default function DashboardPage() {
                         if (allPlansCount.totalItems === 0) {
                             const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/generate-plan', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${pb.authStore.token}`,
+                                },
                                 body: JSON.stringify({
                                     userId: user.id,
                                     currentWeight: userProfile.current_weight,
@@ -296,9 +299,13 @@ export default function DashboardPage() {
         if (!user || !profile || generatingPlan) return;
         setGeneratingPlan(true);
         try {
+            const pb = getPB();
             const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/generate-plan', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${pb.authStore.token}`,
+                },
                 body: JSON.stringify({
                     userId: user.id,
                     currentWeight: profile.current_weight,

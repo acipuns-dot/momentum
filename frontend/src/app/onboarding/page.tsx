@@ -104,7 +104,10 @@ export default function OnboardingPage() {
 
                 const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/generate-plan", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${pb.authStore.token}`,
+                    },
                     body: JSON.stringify({
                         userId: user.id,
                         currentWeight: parseFloat(currentWeight),

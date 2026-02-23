@@ -13,6 +13,11 @@ dotenv.config({ path: '../frontend/.env.local' });
 
 const app = express();
 const PORT = process.env.PORT || 8080;
+const PB_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL || 'http://127.0.0.1:8090';
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || process.env.FRONTEND_ORIGIN || 'http://localhost:3000')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
 
 // Log startup config (masking keys)
 console.log('--- Startup Config ---');
@@ -20,15 +25,24 @@ console.log(`Port: ${PORT}`);
 console.log(`PB URL: ${process.env.NEXT_PUBLIC_POCKETBASE_URL}`);
 console.log(`Anthropic Key set: ${!!process.env.ANTHROPIC_API_KEY}`);
 console.log(`ExerciseDB Key set: ${!!process.env.EXERCIEDB_API_KEY}`);
+console.log(`Allowed Origins: ${allowedOrigins.join(', ')}`);
 console.log('--- end ---');
 
-app.use(cors());
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+            return;
+        }
+        callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+}));
 app.use(express.json());
 
 // --- Database Helper ---
 const getAdminPB = async () => {
-    const pbUrl = process.env.NEXT_PUBLIC_POCKETBASE_URL || "http://127.0.0.1:8090";
-    const pb = new PocketBase(pbUrl);
+    const pb = new PocketBase(PB_URL);
     await pb.admins.authWithPassword(
         process.env.PB_ADMIN_EMAIL!,
         process.env.PB_ADMIN_PASSWORD!
@@ -36,7 +50,41 @@ const getAdminPB = async () => {
     return pb;
 };
 
+const getBearerToken = (req: Request): string | null => {
+    const auth = req.headers.authorization;
+    if (!auth || !auth.startsWith('Bearer ')) return null;
+    return auth.slice(7).trim() || null;
+};
+
+const getRequester = async (req: Request) => {
+    const token = getBearerToken(req);
+    if (!token) return null;
+
+    const pb = new PocketBase(PB_URL);
+    pb.authStore.save(token, null);
+
+    try {
+        await pb.collection('users').authRefresh();
+        return pb.authStore.model;
+    } catch {
+        return null;
+    }
+};
+
 // --- Schemas ---
+const GeneratePlanRequestSchema = z.object({
+    userId: z.string().min(1).optional(),
+    currentWeight: z.number().positive(),
+    goalWeight: z.number().positive(),
+    equipment: z.array(z.string()).optional(),
+    weekOffset: z.number().int().min(0).max(12).optional(),
+});
+
+const TogglePremiumRequestSchema = z.object({
+    targetUserId: z.string().min(1),
+    newPremiumStatus: z.boolean(),
+});
+
 const PlanSchema = z.object({
     estimatedWeeks: z.number(),
     focus: z.enum(['fat_loss', 'cardio_endurance', 'active_recovery']),
@@ -65,7 +113,22 @@ app.get('/health', (req, res) => {
 
 app.post('/generate-plan', async (req: Request, res: Response): Promise<any> => {
     try {
-        const { userId, currentWeight, goalWeight, equipment, weekOffset = 0 } = req.body;
+        const requester = await getRequester(req);
+        if (!requester) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const parsedReq = GeneratePlanRequestSchema.safeParse(req.body);
+        if (!parsedReq.success) {
+            return res.status(400).json({ error: 'Invalid request payload', details: parsedReq.error.flatten() });
+        }
+
+        const { currentWeight, goalWeight, equipment, weekOffset = 0 } = parsedReq.data;
+        const userId = parsedReq.data.userId || requester.id;
+
+        if (userId !== requester.id) {
+            return res.status(403).json({ error: 'Forbidden. Cannot generate a plan for another user.' });
+        }
 
         const pb = await getAdminPB();
 
@@ -87,7 +150,7 @@ app.post('/generate-plan', async (req: Request, res: Response): Promise<any> => 
         let recentLogs: Record<string, unknown>[] = [];
         try {
             recentLogs = await pb.collection('activity_logs_db').getFullList({
-                filter: `user = "${userId}" && end_date >= "${sevenDaysAgo.toISOString()}"`,
+                filter: `user = "${userId}" && date >= "${sevenDaysAgo.toISOString()}"`,
                 sort: '-created'
             });
         } catch (e) {
@@ -191,25 +254,16 @@ Based on this, generate the optimal 7-day weight loss plan.`;
 
 app.get('/admin/users', async (req: Request, res: Response): Promise<any> => {
     try {
-        const adminId = req.query.adminId as string;
-
-        if (!adminId) {
+        const requester = await getRequester(req);
+        if (!requester) {
             return res.status(401).json({ error: 'Unauthorized' });
-        }
-
-        const pb = await getAdminPB();
-
-        let requester;
-        try {
-            requester = await pb.collection('users').getOne(adminId);
-        } catch (e) {
-            return res.status(404).json({ error: 'User not found' });
         }
 
         if (!requester || !requester.is_admin) {
             return res.status(403).json({ error: 'Forbidden. Admins only.' });
         }
 
+        const pb = await getAdminPB();
         const users = await pb.collection('users').getFullList({
             sort: '-created',
         });
@@ -242,24 +296,17 @@ app.get('/admin/users', async (req: Request, res: Response): Promise<any> => {
 
 app.post('/admin/toggle-premium', async (req: Request, res: Response): Promise<any> => {
     try {
-        const { adminId, targetUserId, newPremiumStatus } = req.body;
+        const requester = await getRequester(req);
+        if (!requester) return res.status(401).json({ error: 'Unauthorized' });
+        if (!requester.is_admin) return res.status(403).json({ error: 'Forbidden. Admins only.' });
 
-        if (!adminId || !targetUserId) {
-            return res.status(400).json({ error: 'Missing required fields' });
+        const parsedReq = TogglePremiumRequestSchema.safeParse(req.body);
+        if (!parsedReq.success) {
+            return res.status(400).json({ error: 'Invalid request payload', details: parsedReq.error.flatten() });
         }
+        const { targetUserId, newPremiumStatus } = parsedReq.data;
 
         const pb = await getAdminPB();
-
-        let requester;
-        try {
-            requester = await pb.collection('users').getOne(adminId);
-        } catch (e) {
-            return res.status(404).json({ error: 'Admin user not found' });
-        }
-
-        if (!requester || !requester.is_admin) {
-            return res.status(403).json({ error: 'Forbidden. Admins only.' });
-        }
 
         let premiumUntil = "";
         if (newPremiumStatus) {
@@ -409,6 +456,10 @@ app.get('/exercise-gif', async (req: Request, res: Response): Promise<any> => {
 // --- Diagnostic Helper: Fix missing end_dates ---
 app.get('/admin/fix-database', async (req: Request, res: Response): Promise<any> => {
     try {
+        const requester = await getRequester(req);
+        if (!requester) return res.status(401).json({ error: 'Unauthorized' });
+        if (!requester.is_admin) return res.status(403).json({ error: 'Forbidden. Admins only.' });
+
         const pb = await getAdminPB();
         const plans = await pb.collection('weekly_plans_db').getFullList({
             filter: 'end_date = null || end_date = ""'

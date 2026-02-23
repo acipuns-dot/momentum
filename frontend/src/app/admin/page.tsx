@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { Loader2, Users, DollarSign, Crown, Lock, Search, ChevronLeft } from "lucide-react";
+import { getPB } from "@/lib/pb";
 
 interface UserInfo {
     id: string;
@@ -46,7 +47,12 @@ export default function AdminDashboard() {
     const fetchData = async () => {
         try {
             setLoadingData(true);
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users?adminId=${user.id}`);
+            const token = getPB().authStore.token;
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             if (!res.ok) throw new Error("Failed to fetch admin data");
 
             const data = await res.json();
@@ -64,12 +70,15 @@ export default function AdminDashboard() {
             // Optimistic UI update
             setTogglingMap(prev => ({ ...prev, [targetId]: true }));
             const newStatus = !currentStatus;
+            const token = getPB().authStore.token;
 
             const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/admin/toggle-premium", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
                 body: JSON.stringify({
-                    adminId: user.id,
                     targetUserId: targetId,
                     newPremiumStatus: newStatus
                 })
