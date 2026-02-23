@@ -97,10 +97,10 @@ export default function ExercisesPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans pb-28">
+        <div className="min-h-screen momentum-bg dot-grid-subtle font-sans pb-28 ui-page">
 
             {/* ── Header ───────────────────────────────────────────────── */}
-            <div className="bg-white px-6 pt-12 pb-5 border-b border-slate-100 shadow-sm sticky top-0 z-10">
+            <div className="ui-glass-strong surface-violet px-6 pt-12 pb-5 border-b border-slate-100 ui-card sticky top-0 z-10">
                 <div className="flex items-center gap-3 mb-4">
                     <Link href="/log" className="text-slate-400 hover:text-slate-700 transition-colors">
                         <ArrowLeft size={22} />
@@ -117,7 +117,7 @@ export default function ExercisesPage() {
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && fetchBySearch(search)}
-                        className="w-full bg-slate-100 rounded-2xl pl-10 pr-10 py-3 text-sm font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400"
+                        className="w-full ui-glass rounded-2xl pl-10 pr-10 py-3 text-sm font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400"
                     />
                     {search && (
                         <button onClick={() => { setSearch(''); fetchByTarget(selected.value); }}
@@ -138,8 +138,8 @@ export default function ExercisesPage() {
                                 ref={el => { if (selected.value === t.value && el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }}
                                 onClick={e => handleTargetClick(t, e.currentTarget)}
                                 className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${selected.value === t.value
-                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-500/30'
-                                    : 'bg-white border border-slate-200 text-slate-600'}`}
+                                    ? 'accent-gradient text-white ui-elevated'
+                                    : 'ui-glass border border-slate-200 text-slate-600'}`}
                             >
                                 <span>{t.emoji}</span> {t.label}
                             </button>
@@ -156,7 +156,7 @@ export default function ExercisesPage() {
                 )}
 
                 {error && !loading && (
-                    <div className="bg-red-50 border border-red-100 rounded-2xl p-5 text-center">
+                    <div className="surface-rose border rounded-2xl p-5 text-center">
                         <p className="text-sm font-bold text-red-500">{error}</p>
                     </div>
                 )}
@@ -165,7 +165,7 @@ export default function ExercisesPage() {
                 {search && !loading && exercises.length === 0 && (
                     <button
                         onClick={() => fetchBySearch(search)}
-                        className="w-full bg-primary-500 text-white font-extrabold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-md shadow-primary-500/20"
+                        className="w-full accent-gradient text-white font-extrabold py-4 rounded-2xl flex items-center justify-center gap-2 ui-elevated"
                     >
                         <Search size={18} /> Search "{search}"
                     </button>
@@ -178,7 +178,7 @@ export default function ExercisesPage() {
                             <button
                                 key={ex.id}
                                 onClick={() => setDetail(ex)}
-                                className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden text-left active:scale-[0.97] transition-all hover:border-primary-200"
+                                className="ui-glass surface-blue rounded-2xl border border-slate-100 ui-card overflow-hidden text-left active:scale-[0.97] transition-all hover:border-primary-200"
                             >
                                 {/* GIF or Placeholder */}
                                 <div className="w-full aspect-square bg-slate-100 relative overflow-hidden">
@@ -192,14 +192,14 @@ export default function ExercisesPage() {
                                     ) : (
                                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
                                             <span className="text-4xl">{getBodyPartEmoji(ex.bodyPart)}</span>
-                                            <span className="text-[9px] font-bold text-slate-400 mt-1 uppercase tracking-wider capitalize">{ex.bodyPart}</span>
+                                            <span className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-wider capitalize">{ex.bodyPart}</span>
                                         </div>
                                     )}
                                 </div>
                                 {/* Info */}
                                 <div className="p-3">
                                     <p className="font-bold text-slate-900 text-xs capitalize leading-tight line-clamp-2">{ex.name}</p>
-                                    <p className="text-[10px] font-semibold text-slate-400 mt-1 capitalize">{ex.target} · {ex.equipment}</p>
+                                    <p className="text-xs font-semibold text-slate-400 mt-1 capitalize">{ex.target} · {ex.equipment}</p>
                                 </div>
                             </button>
                         ))}
@@ -209,9 +209,9 @@ export default function ExercisesPage() {
 
             {/* ── Detail Modal ──────────────────────────────────────────────── */}
             {detail && (
-                <div className="fixed inset-0 bg-slate-900/50 z-[60] flex items-end backdrop-blur-sm" onClick={() => setDetail(null)}>
+                <div className="fixed inset-0 bg-slate-900/50 z-[60] flex items-end sm:items-center justify-center backdrop-blur-sm px-3 sm:px-4" onClick={() => setDetail(null)}>
                     <div
-                        className="bg-white rounded-t-3xl w-full max-w-md mx-auto p-6 pb-10 max-h-[90vh] overflow-y-auto"
+                        className="ui-glass-strong surface-violet rounded-t-3xl sm:rounded-[2rem] w-full max-w-md mx-auto p-6 pb-[calc(2.5rem+env(safe-area-inset-bottom))] max-h-[90vh] overflow-y-auto ui-elevated border border-slate-100"
                         onClick={e => e.stopPropagation()}
                     >
                         {/* Close */}
@@ -234,7 +234,7 @@ export default function ExercisesPage() {
                         {/* Meta chips */}
                         <div className="flex flex-wrap gap-2 mb-5">
                             {[detail.bodyPart, detail.target, detail.equipment].map(tag => (
-                                <span key={tag} className="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full capitalize">{tag}</span>
+                                <span key={tag} className="ui-glass text-slate-600 text-xs font-bold px-3 py-1 rounded-full capitalize border border-slate-200">{tag}</span>
                             ))}
                         </div>
 
@@ -244,7 +244,7 @@ export default function ExercisesPage() {
                                 <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Also works</p>
                                 <div className="flex flex-wrap gap-2">
                                     {detail.secondaryMuscles.map(m => (
-                                        <span key={m} className="bg-primary-50 text-primary-600 text-xs font-semibold px-3 py-1 rounded-full capitalize">{m}</span>
+                                        <span key={m} className="surface-emerald text-emerald-700 text-xs font-semibold px-3 py-1 rounded-full capitalize border">{m}</span>
                                     ))}
                                 </div>
                             </div>
@@ -257,7 +257,7 @@ export default function ExercisesPage() {
                                 <div className="space-y-3">
                                     {detail.instructions.map((step, i) => (
                                         <div key={i} className="flex gap-3">
-                                            <div className="w-6 h-6 rounded-full bg-primary-500 text-white text-xs font-black flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</div>
+                                            <div className="w-6 h-6 rounded-full accent-gradient text-white text-xs font-black flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</div>
                                             <p className="text-sm text-slate-600 font-medium leading-relaxed">{step}</p>
                                         </div>
                                     ))}
