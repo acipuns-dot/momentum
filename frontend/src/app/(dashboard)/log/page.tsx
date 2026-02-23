@@ -150,6 +150,8 @@ export default function WorkoutLoggerPage() {
     const [showGuidedSummary, setShowGuidedSummary] = useState(false);
     const guidedVoiceRef = useRef<string>('');
     const guidedMilestoneVoiceRef = useRef<string>('');
+    const speechReadyRef = useRef(false);
+    const preferredVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
 
     // Generic timer
     const [elapsed, setElapsed] = useState(0);
@@ -196,6 +198,29 @@ export default function WorkoutLoggerPage() {
     const guidedTargetRounds = currentEffectiveMode === 'reps'
         ? Math.max(currentGuidedExercise?.sets || 3, 1)
         : guidedConfig.rounds;
+
+    // Load available speech voices once (mobile browsers populate this asynchronously).
+    useEffect(() => {
+        if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+
+        const pickVoice = () => {
+            const voices = window.speechSynthesis.getVoices();
+            if (!voices.length) return;
+            preferredVoiceRef.current =
+                voices.find(v => /en[-_](US|GB)/i.test(v.lang)) ||
+                voices.find(v => /^en/i.test(v.lang)) ||
+                voices[0];
+        };
+
+        pickVoice();
+        window.speechSynthesis.onvoiceschanged = pickVoice;
+
+        return () => {
+            if (window.speechSynthesis.onvoiceschanged === pickVoice) {
+                window.speechSynthesis.onvoiceschanged = null;
+            }
+        };
+    }, []);
 
     // Fetch jump rope GIF once on mount
     useEffect(() => {
@@ -408,12 +433,34 @@ export default function WorkoutLoggerPage() {
 
     const speakCue = (text: string) => {
         if (!guidedVoiceCoachOn || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.02;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-        window.speechSynthesis.speak(utterance);
+        try {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            if (preferredVoiceRef.current) utterance.voice = preferredVoiceRef.current;
+            utterance.rate = 1.02;
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+            utterance.onstart = () => { speechReadyRef.current = true; };
+            window.speechSynthesis.speak(utterance);
+        } catch {
+            // Speech API can fail silently on mobile until user gesture unlock.
+        }
+    };
+
+    const unlockSpeech = () => {
+        if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+        try {
+            const warmup = new SpeechSynthesisUtterance(' ');
+            if (preferredVoiceRef.current) warmup.voice = preferredVoiceRef.current;
+            warmup.volume = 0;
+            warmup.rate = 1;
+            warmup.pitch = 1;
+            warmup.onstart = () => { speechReadyRef.current = true; };
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(warmup);
+        } catch {
+            // no-op
+        }
     };
 
     // 30s pre-start countdown for guided Tabata.
@@ -474,7 +521,7 @@ export default function WorkoutLoggerPage() {
             return;
         }
         guidedVoiceRef.current = '';
-    }, [guidedTabataEnabled, phase, running, guidedStartCountdown, currentExerciseIndex]);
+    }, [guidedTabataEnabled, phase, running, guidedStartCountdown, currentExerciseIndex, guidedVoiceCoachOn]);
 
     // Guided voice cues for countdown and transitions.
     useEffect(() => {
@@ -620,6 +667,8 @@ export default function WorkoutLoggerPage() {
     };
 
     const startGuidedRoutine = () => {
+        // User gesture unlock for speech on mobile browsers (iOS/Android).
+        unlockSpeech();
         if (guidedPlaylistOrder.length === 0) {
             initShuffledPlaylist();
         }
@@ -1150,7 +1199,13 @@ export default function WorkoutLoggerPage() {
                                 </span>
                             </button>
                             <button
-                                onClick={() => setGuidedVoiceCoachOn(v => !v)}
+                                onClick={() => {
+                                    setGuidedVoiceCoachOn(v => {
+                                        const next = !v;
+                                        if (next) unlockSpeech();
+                                        return next;
+                                    });
+                                }}
                                 className={`w-full mt-2 flex items-center justify-between px-4 py-3 rounded-xl border transition-colors ${guidedVoiceCoachOn ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-50 border-slate-200 text-slate-600'}`}
                             >
                                 <span className="text-sm font-black">Voice Coach</span>
