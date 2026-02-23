@@ -16,6 +16,9 @@ export default function DashboardPage() {
     const [plan, setPlan] = useState<any>(null);
     const [loadingPlan, setLoadingPlan] = useState(true);
     const [loggedKcal, setLoggedKcal] = useState(0);
+    const [loggedProtein, setLoggedProtein] = useState(0);
+    const [loggedCarbs, setLoggedCarbs] = useState(0);
+    const [loggedFat, setLoggedFat] = useState(0);
     const [isMealModalOpen, setIsMealModalOpen] = useState(false);
     const [mealCalories, setMealCalories] = useState('');
     const [isWaterModalOpen, setIsWaterModalOpen] = useState(false);
@@ -107,9 +110,9 @@ export default function DashboardPage() {
             const easeProgress = 1 - (1 - progress) * (1 - progress);
 
             setAnimatedKcal(Math.round(loggedKcal * easeProgress));
-            setAnimatedProtein(Math.round((loggedKcal > 0 ? targetProtein : 0) * easeProgress)); // Dummy logic for demo
-            setAnimatedCarbs(Math.round((loggedKcal > 0 ? targetCarbs : 0) * easeProgress));
-            setAnimatedFat(Math.round((loggedKcal > 0 ? targetFat : 0) * easeProgress));
+            setAnimatedProtein(Math.round(loggedProtein * easeProgress));
+            setAnimatedCarbs(Math.round(loggedCarbs * easeProgress));
+            setAnimatedFat(Math.round(loggedFat * easeProgress));
 
             if (currentStep >= steps) {
                 clearInterval(counterInterval);
@@ -118,7 +121,7 @@ export default function DashboardPage() {
         }, stepTime);
 
         return () => clearInterval(counterInterval);
-    }, [isMounted, loggedKcal, targetProtein, targetCarbs, targetFat]);
+    }, [isMounted, loggedKcal, loggedProtein, loggedCarbs, loggedFat]);
 
 
     useEffect(() => {
@@ -216,6 +219,9 @@ export default function DashboardPage() {
                     const record = nutritionRecords[0];
                     setNutritionRecordId(record.id);
                     setLoggedKcal(record.logged_kcal || 0);
+                    setLoggedProtein(record.logged_protein_g || 0);
+                    setLoggedCarbs(record.logged_carbs_g || 0);
+                    setLoggedFat(record.logged_fat_g || 0);
                 }
 
                 // 4. Fetch weight logs from last 7 days to compute weekly change
@@ -286,11 +292,23 @@ export default function DashboardPage() {
                 if (recs.length > 0) {
                     setNutritionRecordId(recs[0].id);
                     setLoggedKcal(recs[0].logged_kcal || 0);
+                    setLoggedProtein(recs[0].logged_protein_g || 0);
+                    setLoggedCarbs(recs[0].logged_carbs_g || 0);
+                    setLoggedFat(recs[0].logged_fat_g || 0);
                 } else {
                     setNutritionRecordId(null);
                     setLoggedKcal(0);
+                    setLoggedProtein(0);
+                    setLoggedCarbs(0);
+                    setLoggedFat(0);
                 }
-            } catch (_) { setNutritionRecordId(null); setLoggedKcal(0); }
+            } catch (_) {
+                setNutritionRecordId(null);
+                setLoggedKcal(0);
+                setLoggedProtein(0);
+                setLoggedCarbs(0);
+                setLoggedFat(0);
+            }
         })();
     }, [selectedDateStr, user]);
 
@@ -336,6 +354,9 @@ export default function DashboardPage() {
                     logged_kcal: loggedKcal + addKcal
                 });
                 setLoggedKcal(updated.logged_kcal);
+                setLoggedProtein(updated.logged_protein_g || 0);
+                setLoggedCarbs(updated.logged_carbs_g || 0);
+                setLoggedFat(updated.logged_fat_g || 0);
             } else {
                 // Create
                 const created = await pb.collection('nutrition_targets_db').create({
@@ -345,10 +366,16 @@ export default function DashboardPage() {
                     logged_kcal: addKcal,
                     protein_g: targetProtein,
                     carbs_g: targetCarbs,
-                    fat_g: targetFat
+                    fat_g: targetFat,
+                    logged_protein_g: 0,
+                    logged_carbs_g: 0,
+                    logged_fat_g: 0,
                 });
                 setNutritionRecordId(created.id);
                 setLoggedKcal(created.logged_kcal);
+                setLoggedProtein(created.logged_protein_g || 0);
+                setLoggedCarbs(created.logged_carbs_g || 0);
+                setLoggedFat(created.logged_fat_g || 0);
             }
         } catch (e) {
             console.error("Failed to save meal log", e);

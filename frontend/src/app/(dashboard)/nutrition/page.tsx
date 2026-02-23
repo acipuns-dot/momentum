@@ -45,6 +45,9 @@ export default function NutritionPage() {
     const [profile, setProfile] = useState<{ current_weight?: number; goal_weight?: number; activity_level?: string } | null>(null);
     const [meals, setMeals] = useState<Meal[]>([]);
     const [loggedKcal, setLoggedKcal] = useState(0);
+    const [loggedProtein, setLoggedProtein] = useState(0);
+    const [loggedCarbs, setLoggedCarbs] = useState(0);
+    const [loggedFat, setLoggedFat] = useState(0);
     const [nutritionRecordId, setNutritionRecordId] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeCategory, setActiveCategory] = useState<Category>('Breakfast');
@@ -82,9 +85,15 @@ export default function NutritionPage() {
                 if (records.length > 0) {
                     setNutritionRecordId(records[0].id);
                     setLoggedKcal(records[0].logged_kcal || 0);
+                    setLoggedProtein(records[0].logged_protein_g || 0);
+                    setLoggedCarbs(records[0].logged_carbs_g || 0);
+                    setLoggedFat(records[0].logged_fat_g || 0);
                 } else {
                     setNutritionRecordId(null);
                     setLoggedKcal(0);
+                    setLoggedProtein(0);
+                    setLoggedCarbs(0);
+                    setLoggedFat(0);
                 }
             })
             .catch(console.error);
@@ -105,22 +114,26 @@ export default function NutritionPage() {
     const targetCarbs = plan?.targetCarbs || computed.targetCarbs;
     const targetFat = plan?.targetFat || computed.targetFat;
 
-    const totalProtein = meals.reduce((s, m) => s + m.protein, 0);
-    const totalCarbs = meals.reduce((s, m) => s + m.carbs, 0);
-    const totalFat = meals.reduce((s, m) => s + m.fat, 0);
-
     const remaining = Math.max(targetKcal - loggedKcal, 0);
     const kcalPct = Math.min((loggedKcal / targetKcal) * 100, 100);
 
     const mealsByCategory = (cat: Category) => meals.filter((m) => m.category === cat);
     const presetsForCategory = PRESETS.filter((p) => p.category === activeCategory);
 
-    const syncLoggedCalories = async (nextKcal: number) => {
+    const syncLoggedNutrition = async (
+        nextKcal: number,
+        nextProtein: number,
+        nextCarbs: number,
+        nextFat: number
+    ) => {
         if (!user) return;
         const pb = getPB();
         if (nutritionRecordId) {
             await pb.collection('nutrition_targets_db').update(nutritionRecordId, {
                 logged_kcal: nextKcal,
+                logged_protein_g: nextProtein,
+                logged_carbs_g: nextCarbs,
+                logged_fat_g: nextFat,
             });
             return;
         }
@@ -133,15 +146,31 @@ export default function NutritionPage() {
             protein_g: targetProtein,
             carbs_g: targetCarbs,
             fat_g: targetFat,
+            logged_protein_g: nextProtein,
+            logged_carbs_g: nextCarbs,
+            logged_fat_g: nextFat,
         });
         setNutritionRecordId(created.id);
     };
 
-    const updateCalories = async (delta: number) => {
-        const next = Math.max(loggedKcal + delta, 0);
-        setLoggedKcal(next);
+    const updateLoggedNutrition = async (
+        deltaKcal: number,
+        deltaProtein: number,
+        deltaCarbs: number,
+        deltaFat: number
+    ) => {
+        const nextKcal = Math.max(loggedKcal + deltaKcal, 0);
+        const nextProtein = Math.max(loggedProtein + deltaProtein, 0);
+        const nextCarbs = Math.max(loggedCarbs + deltaCarbs, 0);
+        const nextFat = Math.max(loggedFat + deltaFat, 0);
+
+        setLoggedKcal(nextKcal);
+        setLoggedProtein(nextProtein);
+        setLoggedCarbs(nextCarbs);
+        setLoggedFat(nextFat);
+
         try {
-            await syncLoggedCalories(next);
+            await syncLoggedNutrition(nextKcal, nextProtein, nextCarbs, nextFat);
         } catch (error) {
             console.error('Failed to sync nutrition log', error);
         }
@@ -150,7 +179,7 @@ export default function NutritionPage() {
     const addPreset = async (preset: Omit<Meal, 'id'>) => {
         const meal = { ...preset, id: uid() };
         setMeals((prev) => [...prev, meal]);
-        await updateCalories(meal.kcal);
+        await updateLoggedNutrition(meal.kcal, meal.protein, meal.carbs, meal.fat);
         setIsModalOpen(false);
     };
 
@@ -166,7 +195,7 @@ export default function NutritionPage() {
             fat: Number(form.fat) || 0,
         };
         setMeals((prev) => [...prev, meal]);
-        await updateCalories(meal.kcal);
+        await updateLoggedNutrition(meal.kcal, meal.protein, meal.carbs, meal.fat);
         setForm({ name: '', kcal: '', protein: '', carbs: '', fat: '' });
         setIsModalOpen(false);
     };
@@ -174,7 +203,7 @@ export default function NutritionPage() {
     const removeMeal = async (id: string) => {
         const meal = meals.find((m) => m.id === id);
         setMeals((prev) => prev.filter((m) => m.id !== id));
-        if (meal) await updateCalories(-meal.kcal);
+        if (meal) await updateLoggedNutrition(-meal.kcal, -meal.protein, -meal.carbs, -meal.fat);
     };
 
     return (
@@ -204,9 +233,9 @@ export default function NutritionPage() {
 
                 <div className="flex gap-3 mt-4">
                     {[
-                        { label: 'Protein', val: totalProtein, target: targetProtein, color: 'bg-blue-500' },
-                        { label: 'Carbs', val: totalCarbs, target: targetCarbs, color: 'bg-orange-400' },
-                        { label: 'Fat', val: totalFat, target: targetFat, color: 'bg-red-400' },
+                        { label: 'Protein', val: loggedProtein, target: targetProtein, color: 'bg-blue-500' },
+                        { label: 'Carbs', val: loggedCarbs, target: targetCarbs, color: 'bg-orange-400' },
+                        { label: 'Fat', val: loggedFat, target: targetFat, color: 'bg-red-400' },
                     ].map(({ label, val, target, color }) => (
                         <div key={label} className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl p-2.5 flex flex-col items-center">
                             <div className="w-full h-1 bg-slate-200 rounded-full mb-2 overflow-hidden">
