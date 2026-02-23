@@ -81,7 +81,7 @@ export default function DashboardPage() {
     const [baseOffset, setBaseOffset] = useState(-2); // leftmost card offset from today
     const [selectedOffset, setSelectedOffset] = useState(0); // selected card offset from today
     const dayRefs = useRef<(HTMLDivElement | null)[]>([]);
-    const touchStartX = useRef(0);
+    const touchStart = useRef<{ x: number; y: number } | null>(null);
     const skipFirstDateEffect = useRef(true);
 
     // Derive selected date string and isToday flag
@@ -95,11 +95,22 @@ export default function DashboardPage() {
     const shiftCalendar = (dir: 'past' | 'future') => {
         setBaseOffset(b => dir === 'past' ? b - 1 : b + 1);
     };
-    const onTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
+    const onTouchStart = (e: React.TouchEvent) => {
+        touchStart.current = {
+            x: e.touches[0].clientX,
+            y: e.touches[0].clientY,
+        };
+    };
     const onTouchEnd = (e: React.TouchEvent) => {
-        const delta = e.changedTouches[0].clientX - touchStartX.current;
-        if (delta > 50) shiftCalendar('past');
-        else if (delta < -50) shiftCalendar('future');
+        if (!touchStart.current) return;
+        const deltaX = e.changedTouches[0].clientX - touchStart.current.x;
+        const deltaY = e.changedTouches[0].clientY - touchStart.current.y;
+        const horizontalSwipe = Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2;
+        if (horizontalSwipe) {
+            if (deltaX > 0) shiftCalendar('past');
+            else shiftCalendar('future');
+        }
+        touchStart.current = null;
     };
 
     // Trigger on-mount animations
@@ -571,6 +582,7 @@ export default function DashboardPage() {
             {/* Calendar Strip */}
             <div
                 className="w-full px-4 pb-3 pt-2 -mt-4 mb-4 select-none space-y-2"
+                style={{ touchAction: 'pan-y' }}
                 onTouchStart={onTouchStart}
                 onTouchEnd={onTouchEnd}
             >
