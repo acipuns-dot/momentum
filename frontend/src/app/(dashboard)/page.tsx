@@ -673,7 +673,7 @@ export default function DashboardPage() {
                         {/* Donut Chart */}
                         <div className="relative w-32 h-32 flex-shrink-0">
                             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#f1f5f9" strokeWidth="12" />
+                                <circle cx="50" cy="50" r="40" fill="transparent" stroke="rgba(148,163,184,0.28)" strokeWidth="11" />
                                 <circle cx="50" cy="50" r="40" fill="transparent" stroke="#f97316" strokeWidth="12" strokeDasharray="251.2" strokeDashoffset={currentDashoffset} strokeLinecap="round" className="transition-all duration-[1500ms] ease-out" />
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
