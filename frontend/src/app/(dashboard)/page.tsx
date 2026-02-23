@@ -9,6 +9,8 @@ import { getPB } from '@/lib/pb';
 import { calcNutritionTargets } from '@/lib/nutritionTargets';
 import PremiumPaywallModal from '@/components/PremiumPaywallModal';
 
+const GUIDED_COMPLETION_TAG = '[guided_plan:today_completed]';
+
 export default function DashboardPage() {
     const { user } = useAuth();
     const [profile, setProfile] = useState<any>(null);
@@ -30,6 +32,7 @@ export default function DashboardPage() {
     const [generatingPremiumPlan, setGeneratingPremiumPlan] = useState(false);
     const [weeklyWeightChange, setWeeklyWeightChange] = useState<number | null>(null);
     const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+    const [isTodayWorkoutCompleted, setIsTodayWorkoutCompleted] = useState(false);
     const [isNoticeOpen, setIsNoticeOpen] = useState(false);
     const [noticeTitle, setNoticeTitle] = useState('Notice');
     const [noticeMessage, setNoticeMessage] = useState('');
@@ -267,6 +270,16 @@ export default function DashboardPage() {
                         setHydrationRecordId(hydrationRecords[0].id);
                     }
                 } catch (_) { /* no hydration logs yet */ }
+
+                // 6. Check if today's guided workout is completed
+                try {
+                    const completion = await pb.collection('activity_logs_db').getList(1, 1, {
+                        filter: `user = "${user.id}" && date >= "${today.toISOString()}" && date < "${tomorrow.toISOString()}" && notes ~ "${GUIDED_COMPLETION_TAG}"`,
+                    });
+                    setIsTodayWorkoutCompleted(completion.totalItems > 0);
+                } catch (_) {
+                    setIsTodayWorkoutCompleted(false);
+                }
 
             } catch (e) {
                 console.error("Error fetching user data", e);
@@ -1009,13 +1022,23 @@ export default function DashboardPage() {
                             {/* Footer */}
                             <div className="pt-2 border-t border-slate-100 mt-auto">
                                 {isToday ? (
-                                    <Link
-                                        href="/log?plan=today"
-                                        className="w-full bg-[#f97316] hover:bg-orange-600 text-white font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-orange-500/30"
-                                    >
-                                        <span>Start Workout</span>
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-                                    </Link>
+                                    isTodayWorkoutCompleted ? (
+                                        <button
+                                            disabled
+                                            className="w-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed"
+                                        >
+                                            <CheckCircle2 size={18} />
+                                            <span>Completed Today</span>
+                                        </button>
+                                    ) : (
+                                        <Link
+                                            href="/log?plan=today"
+                                            className="w-full bg-[#f97316] hover:bg-orange-600 text-white font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-orange-500/30"
+                                        >
+                                            <span>Start Workout</span>
+                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+                                        </Link>
+                                    )
                                 ) : (
                                     <button
                                         onClick={() => setIsWorkoutBriefOpen(false)}

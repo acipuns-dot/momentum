@@ -58,6 +58,7 @@ const GUIDED_PLAYLIST = [
     '/audio/tabata-bg-2.mp3',
     '/audio/tabata-bg-3.mp3',
 ];
+const GUIDED_COMPLETION_TAG = '[guided_plan:today_completed]';
 const GUIDED_MODIFIERS = {
     easy: { workSecs: 15, restSecs: 20, rounds: 6, label: 'Easy' },
     standard: { workSecs: 20, restSecs: 20, rounds: 8, label: 'Standard' },
@@ -680,18 +681,19 @@ export default function WorkoutLoggerPage() {
         const extraNotes = selected.id === 'jump'
             ? `[${sessionType.label} · ${intervalMode.label}] Jumps: ${jumpCount}${rpm > 0 ? ` · RPM: ${rpm}` : ''}${notes ? ` | ${notes}` : ''}`
             : notes;
+        const completionTaggedNotes = `${extraNotes || ''}${isPlanMode ? ` ${GUIDED_COMPLETION_TAG}` : ''}`.trim();
 
         try {
             const pb = getPB();
             const record = await pb.collection('activity_logs_db').create({
                 user: user.id, date: new Date().toISOString(),
                 activity: selected.label, duration_mins: durationMins,
-                effort_level: effort, kcal_burned: kcalBurned, notes: extraNotes,
+                effort_level: effort, kcal_burned: kcalBurned, notes: completionTaggedNotes,
             });
             setLogs(prev => [{
                 id: record.id, activity: selected.label,
                 icon: ACTIVITY_EMOJIS[selected.id] || '⚡️',
-                durationMins, effort, kcalBurned, notes: extraNotes,
+                durationMins, effort, kcalBurned, notes: completionTaggedNotes,
                 time: new Date(record.date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
             }, ...prev]);
         } catch (e) { console.error('Failed to save log', e); }
