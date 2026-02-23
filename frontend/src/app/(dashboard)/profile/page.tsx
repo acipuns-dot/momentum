@@ -162,6 +162,11 @@ export default function ProfilePage() {
     const premiumUntilLabel = premiumUntil
         ? premiumUntil.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
         : null;
+    const trialStart = user?.created ? new Date(user.created) : null;
+    const trialEnd = trialStart ? new Date(trialStart.getTime() + (7 * 24 * 60 * 60 * 1000)) : null;
+    const trialDaysLeft = trialEnd
+        ? Math.max(0, Math.ceil((trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+        : 7;
 
     return (
         <div className="min-h-screen bg-[#f8f9fa] pb-32 font-sans max-w-md mx-auto">
@@ -196,6 +201,14 @@ export default function ProfilePage() {
                             <Crown size={12} className="text-amber-500" />
                             <span className="text-[11px] font-bold text-amber-600">
                                 Premium · Expires {premiumUntilLabel}
+                            </span>
+                        </div>
+                    )}
+                    {!isPremiumActive && (
+                        <div className="flex items-center gap-1.5 mt-1">
+                            <Calendar size={12} className="text-slate-500" />
+                            <span className="text-[11px] font-bold text-slate-600">
+                                Free Trial · {trialDaysLeft > 0 ? `${trialDaysLeft} day${trialDaysLeft > 1 ? 's' : ''} left` : 'Ended'}
                             </span>
                         </div>
                     )}
