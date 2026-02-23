@@ -34,7 +34,7 @@ export default function LoginPage() {
             <div className="w-full max-w-sm">
                 <div className="text-center mb-10">
                     <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-3xl overflow-hidden ui-elevated ring-1 ring-slate-500/30">
-                        <img src="/apple-touch-icon.png" alt="Momentum Logo" className="w-full h-full object-cover" />
+                        <img src="/icon-192x192.png" alt="Momentum Logo" className="w-full h-full object-cover" />
                     </div>
                     <h1 className="text-3xl font-black tracking-tight mb-2"><span className="text-slate-900">Momen</span><span className="text-[#f97316]">tum</span></h1>
                     <p className="text-sm text-slate-400 font-semibold">Train smart. Build momentum every day.</p>
