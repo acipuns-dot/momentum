@@ -52,6 +52,12 @@ const INTERVAL_MODES = [
     { id: 'boxing', label: 'Boxing Rounds', desc: '3 min / 1 min rest × 8 rounds (~32 min)', workSecs: 180, restSecs: 60, rounds: 8, kcalRange: '~350–590 kcal' },
     { id: 'endurance', label: 'Endurance', desc: '5 min / 90s rest × 5 rounds (~32 min)', workSecs: 300, restSecs: 90, rounds: 5, kcalRange: '~360–600 kcal' },
 ];
+
+const GUIDED_PLAYLIST = [
+    '/audio/tabata-bg.mp3',
+    '/audio/tabata-bg-2.mp3',
+    '/audio/tabata-bg-3.mp3',
+];
 const GUIDED_MODIFIERS = {
     easy: { workSecs: 15, restSecs: 20, rounds: 6, label: 'Easy' },
     standard: { workSecs: 20, restSecs: 20, rounds: 8, label: 'Standard' },
@@ -150,6 +156,8 @@ export default function WorkoutLoggerPage() {
     const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const guidedMusicRef = useRef<HTMLAudioElement | null>(null);
     const [guidedMusicOn, setGuidedMusicOn] = useState(true);
+    const [guidedPlaylistOrder, setGuidedPlaylistOrder] = useState<number[]>([]);
+    const [guidedTrackCursor, setGuidedTrackCursor] = useState(0);
 
     // Post-workout form
     const [effort, setEffort] = useState(7);
@@ -369,7 +377,33 @@ export default function WorkoutLoggerPage() {
         } else {
             audio.pause();
         }
-    }, [phase, running, guidedMusicOn]);
+    }, [phase, running, guidedMusicOn, guidedTrackCursor, guidedPlaylistOrder]);
+
+    const shufflePlaylist = (): number[] => {
+        const arr = GUIDED_PLAYLIST.map((_, i) => i);
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    };
+
+    const initShuffledPlaylist = () => {
+        const order = shufflePlaylist();
+        setGuidedPlaylistOrder(order);
+        setGuidedTrackCursor(0);
+    };
+
+    const playNextShuffledTrack = () => {
+        setGuidedTrackCursor((prev) => {
+            if (guidedPlaylistOrder.length === 0) return 0;
+            const next = prev + 1;
+            if (next < guidedPlaylistOrder.length) return next;
+            const reshuffled = shufflePlaylist();
+            setGuidedPlaylistOrder(reshuffled);
+            return 0;
+        });
+    };
 
     const speakCue = (text: string) => {
         if (!guidedVoiceCoachOn || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
@@ -585,6 +619,9 @@ export default function WorkoutLoggerPage() {
     };
 
     const startGuidedRoutine = () => {
+        if (guidedPlaylistOrder.length === 0) {
+            initShuffledPlaylist();
+        }
         setPhase('guided_active');
         setCurrentExerciseIndex(0);
         setElapsed(0);
@@ -1313,7 +1350,13 @@ export default function WorkoutLoggerPage() {
                     </div>
                 </div>
             )}
-            <audio ref={guidedMusicRef} src="/audio/tabata-bg.mp3" loop preload="auto" playsInline />
+            <audio
+                ref={guidedMusicRef}
+                src={GUIDED_PLAYLIST[guidedPlaylistOrder[guidedTrackCursor] ?? 0]}
+                preload="auto"
+                playsInline
+                onEnded={playNextShuffledTrack}
+            />
         </div>
     );
 }
