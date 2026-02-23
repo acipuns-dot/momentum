@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Target, Droplet, Plus, MoreHorizontal, CheckCircle2, Circle, Loader2, Bell, Clock, Calendar, ArrowDown, RotateCcw, Crown } from 'lucide-react';
+import { Target, Droplet, Plus, MoreHorizontal, CheckCircle2, Circle, Loader2, Bell, Clock, Calendar, ArrowDown, RotateCcw, Crown, X } from 'lucide-react';
 import Image from 'next/image';
 import { useAuth } from '@/lib/auth';
 import { getPB } from '@/lib/pb';
@@ -30,6 +30,9 @@ export default function DashboardPage() {
     const [generatingPremiumPlan, setGeneratingPremiumPlan] = useState(false);
     const [weeklyWeightChange, setWeeklyWeightChange] = useState<number | null>(null);
     const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+    const [isNoticeOpen, setIsNoticeOpen] = useState(false);
+    const [noticeTitle, setNoticeTitle] = useState('Notice');
+    const [noticeMessage, setNoticeMessage] = useState('');
 
     // Animation States
     const [animatedKcal, setAnimatedKcal] = useState(0);
@@ -55,6 +58,11 @@ export default function DashboardPage() {
     const premiumDaysLeft = isPremiumActive ? Math.ceil((premiumUntilMs - Date.now()) / (1000 * 60 * 60 * 24)) : null;
     const showPremiumExpiryWarning = isPremiumActive && premiumDaysLeft !== null && premiumDaysLeft <= 3;
     const whatsappUpgradeUrl = process.env.NEXT_PUBLIC_WHATSAPP_UPGRADE_URL || 'https://wa.me/';
+    const openNotice = (message: string, title = 'Notice') => {
+        setNoticeTitle(title);
+        setNoticeMessage(message);
+        setIsNoticeOpen(true);
+    };
 
     // Progress Calculation
     // Use the actual loggedKcal for the final value, but draw the progress based on animation
@@ -345,13 +353,13 @@ export default function DashboardPage() {
                 setPlan(data);
             } else if (res.status === 429) {
                 const payload = await res.json().catch(() => null);
-                alert(payload?.error || 'Refresh limit reached for this 30-day window.');
+                openNotice(payload?.error || 'Refresh limit reached for this 30-day window.', 'Refresh Limit');
                 if (!isPremiumActive) {
                     setIsPaywallOpen(true);
                 }
             } else if (res.status === 403) {
                 const payload = await res.json().catch(() => null);
-                if (payload?.error) alert(payload.error);
+                if (payload?.error) openNotice(payload.error, 'Upgrade Required');
                 setIsPaywallOpen(true);
             }
         } catch (e) {
@@ -395,7 +403,7 @@ export default function DashboardPage() {
                     }
                     if (res.status === 429) {
                         const payload = await res.json().catch(() => null);
-                        alert(payload?.error || 'Premium generation limit reached for this 30-day window.');
+                        openNotice(payload?.error || 'Premium generation limit reached for this 30-day window.', 'Premium Limit');
                         return;
                     }
                     throw new Error('Failed to generate premium plan');
@@ -1027,6 +1035,31 @@ export default function DashboardPage() {
                 onClose={() => setIsPaywallOpen(false)}
                 whatsappUrl={whatsappUpgradeUrl}
             />
+
+            {isNoticeOpen && (
+                <div className="fixed inset-0 z-[85] flex items-center justify-center px-5">
+                    <div className="absolute inset-0 bg-slate-900/45 backdrop-blur-sm" onClick={() => setIsNoticeOpen(false)} />
+                    <div className="relative w-full max-w-md bg-white rounded-[1.5rem] p-5 border border-slate-100 shadow-2xl">
+                        <button
+                            onClick={() => setIsNoticeOpen(false)}
+                            className="absolute right-3 top-3 w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"
+                            aria-label="Close notice"
+                        >
+                            <X size={16} />
+                        </button>
+                        <h3 className="text-lg font-black text-slate-900 pr-10">{noticeTitle}</h3>
+                        <p className="text-sm font-medium text-slate-600 mt-2 leading-relaxed">
+                            {noticeMessage}
+                        </p>
+                        <button
+                            onClick={() => setIsNoticeOpen(false)}
+                            className="mt-5 w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold transition-colors"
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            )}
 
         </div >
     );
