@@ -120,7 +120,7 @@ export default function ProgressPage() {
     }).join(' ');
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle text-slate-900 pb-32 font-sans selection:bg-orange-500 selection:text-white max-w-md mx-auto shadow-2xl shadow-slate-200/50">
+        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle text-slate-900 pb-32 font-sans selection:bg-orange-500 selection:text-white max-w-md mx-auto ui-elevated ">
             {/* Header */}
             <div className="pt-12 px-6 mb-8 flex items-center justify-between">
                 <div>
@@ -129,7 +129,7 @@ export default function ProgressPage() {
                 </div>
                 <button
                     onClick={() => setIsLogModalOpen(true)}
-                    className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-slate-700 hover:text-[#f97316] hover:border-orange-200 transition-colors"
+                    className="w-12 h-12 bg-white rounded-full flex items-center justify-center ui-card border border-slate-100 text-slate-700 hover:text-[#f97316] hover:border-orange-200 transition-colors"
                 >
                     <Plus size={24} />
                 </button>
@@ -138,7 +138,7 @@ export default function ProgressPage() {
             <div className="px-6 space-y-6">
 
                 {/* Master Overview Card */}
-                <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 relative overflow-hidden">
+                <div className="bg-white rounded-[2rem] p-6 ui-card border border-slate-100 relative overflow-hidden">
                     <div className="flex justify-between items-start mb-6">
                         <div className="flex items-center gap-2">
                             <Scale size={20} className="text-[#f97316]" />
@@ -166,7 +166,7 @@ export default function ProgressPage() {
                                 style={{ width: `${currentProgress}%` }}
                             ></div>
                         </div>
-                        <div className="text-right text-[10px] font-bold text-slate-400">
+                        <div className="text-right text-xs font-bold text-slate-400">
                             {toGo > 0 ? `${toGo.toFixed(1)}kg to go` : 'Goal reached! 🎉'}
                         </div>
                     </div>
@@ -176,7 +176,7 @@ export default function ProgressPage() {
                 </div>
 
                 {/* The Chart */}
-                <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100">
+                <div className="bg-white rounded-[2rem] p-6 ui-card border border-slate-100">
                     <div className="flex items-center gap-2 mb-6">
                         <LineChart size={20} className="text-blue-500" />
                         <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Weight Trend</h2>
@@ -244,7 +244,7 @@ export default function ProgressPage() {
                                 {[0, 25, 50, 75, 100].map(pct => {
                                     const val = maxWeight - (pct / 100) * chartRange;
                                     return (
-                                        <span key={pct} className="text-[8px] font-bold text-slate-300 text-right leading-none">
+                                        <span key={pct} className="text-xs font-bold text-slate-300 text-right leading-none">
                                             {val.toFixed(1)}
                                         </span>
                                     );
@@ -253,10 +253,10 @@ export default function ProgressPage() {
 
                             {/* X-axis date labels */}
                             <div className="flex justify-between mt-1 px-0.5">
-                                <span className="text-[8px] font-bold text-slate-400">
+                                <span className="text-xs font-bold text-slate-400">
                                     {new Date(weightLogs[0].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                 </span>
-                                <span className="text-[8px] font-bold text-slate-400">
+                                <span className="text-xs font-bold text-slate-400">
                                     {new Date(weightLogs[weightLogs.length - 1].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                 </span>
                             </div>
@@ -265,13 +265,13 @@ export default function ProgressPage() {
                         <div className="w-full h-40 flex flex-col items-center justify-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
                             <LineChart size={32} className="text-slate-300 mb-2" />
                             <p className="text-sm font-bold text-slate-500">Not enough data yet.</p>
-                            <p className="text-[11px] text-slate-400">Log your weight a few times to see a trend!</p>
+                            <p className="text-xs text-slate-400">Log your weight a few times to see a trend!</p>
                         </div>
                     )}
                 </div>
 
                 {/* History List */}
-                <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100">
+                <div className="bg-white rounded-[2rem] p-6 ui-card border border-slate-100">
                     <div className="flex items-center gap-2 mb-6">
                         <CalendarDays size={20} className="text-purple-500" />
                         <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">History</h2>
@@ -300,7 +300,7 @@ export default function ProgressPage() {
                         className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in"
                         onClick={() => setIsLogModalOpen(false)}
                     ></div>
-                    <div className="bg-white rounded-[2rem] p-6 w-full max-w-sm relative z-10 shadow-2xl animate-in zoom-in-95 duration-200">
+                    <div className="bg-white rounded-[2rem] p-6 w-full max-w-sm relative z-10 ui-elevated animate-in zoom-in-95 duration-200">
                         <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center mb-4 mx-auto border border-orange-100">
                             <Scale className="text-[#f97316]" size={24} />
                         </div>
@@ -330,7 +330,7 @@ export default function ProgressPage() {
                             <button
                                 onClick={handleLogWeight}
                                 disabled={!newWeight || isNaN(parseFloat(newWeight)) || loggingState}
-                                className="py-3 rounded-xl font-bold text-white bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 transition-colors flex items-center justify-center shadow-lg shadow-orange-500/30"
+                                className="py-3 rounded-xl font-bold text-white bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 transition-colors flex items-center justify-center ui-elevated "
                             >
                                 {loggingState ? <Loader2 size={18} className="animate-spin" /> : "Save"}
                             </button>
@@ -342,3 +342,4 @@ export default function ProgressPage() {
         </div>
     );
 }
+

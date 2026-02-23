@@ -512,11 +512,11 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle text-slate-900 pb-32 font-sans selection:bg-orange-500 selection:text-white max-w-md mx-auto relative shadow-2xl shadow-slate-200/50">
+        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle text-slate-900 pb-32 font-sans selection:bg-orange-500 selection:text-white max-w-md mx-auto relative ui-elevated ">
 
             <div className="pt-12 px-6 flex justify-between items-start mb-8">
                 <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center relative">
+                    <div className="w-14 h-14 rounded-full bg-white ui-card border border-slate-100 flex items-center justify-center relative">
                         {/* Inner orange ring with white square inside, mimicking the avatar in the image */}
                         <div className="w-12 h-12 rounded-full border-2 border-[#f97316] p-0.5 flex items-center justify-center">
                             <div className="w-full h-full bg-[#fcead7] rounded-full flex items-center justify-center">
@@ -530,7 +530,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
                 {/* Bell only — plan button moved to Daily Protocol section */}
-                <button className="w-10 h-10 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center relative mt-2">
+                <button className="w-10 h-10 rounded-full bg-white ui-card border border-slate-100 flex items-center justify-center relative mt-2">
                     <Bell size={18} className="text-slate-700 fill-slate-700" />
                     <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-[#f97316] border-2 border-white rounded-full"></span>
                 </button>
@@ -544,7 +544,7 @@ export default function DashboardPage() {
                     </div>
                     <button
                         onClick={() => setIsPaywallOpen(true)}
-                        className="px-3 py-2 rounded-xl bg-amber-500 text-white text-xs font-black shadow-sm whitespace-nowrap"
+                        className="px-3 py-2 rounded-xl bg-amber-500 text-white text-xs font-black ui-card whitespace-nowrap"
                     >
                         Upgrade
                     </button>
@@ -561,7 +561,7 @@ export default function DashboardPage() {
                     </div>
                     <button
                         onClick={() => setIsPaywallOpen(true)}
-                        className="px-3 py-2 rounded-xl bg-rose-500 text-white text-xs font-black shadow-sm whitespace-nowrap"
+                        className="px-3 py-2 rounded-xl bg-rose-500 text-white text-xs font-black ui-card whitespace-nowrap"
                     >
                         Renew
                     </button>
@@ -581,11 +581,11 @@ export default function DashboardPage() {
                     const monthLabel = centerDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
                     return (
                         <div className="flex items-center gap-2">
-                            <button onClick={() => shiftCalendar('past')} className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-slate-100 shadow-sm text-slate-400 hover:text-slate-700 hover:border-slate-300 transition-all flex-shrink-0">
+                            <button onClick={() => shiftCalendar('past')} className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-slate-100 ui-card text-slate-400 hover:text-slate-700 hover:border-slate-300 transition-all flex-shrink-0">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
                             </button>
                             <p className="flex-1 text-center text-sm font-extrabold text-slate-700 tracking-tight">{monthLabel}</p>
-                            <button onClick={() => shiftCalendar('future')} className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-slate-100 shadow-sm text-slate-400 hover:text-slate-700 hover:border-slate-300 transition-all flex-shrink-0">
+                            <button onClick={() => shiftCalendar('future')} className="w-8 h-8 flex items-center justify-center rounded-full bg-white border border-slate-100 ui-card text-slate-400 hover:text-slate-700 hover:border-slate-300 transition-all flex-shrink-0">
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
                             </button>
                         </div>
@@ -608,13 +608,13 @@ export default function DashboardPage() {
                                 key={offset}
                                 onClick={() => setSelectedOffset(offset)}
                                 className={`flex-1 flex flex-col items-center justify-center h-20 rounded-[1.2rem] cursor-pointer transition-all ${isSelected
-                                    ? 'bg-[#f97316] text-white shadow-lg shadow-orange-500/30'
+                                    ? 'bg-[#f97316] text-white ui-elevated '
                                     : isFuture
                                         ? 'bg-slate-50 border border-slate-100 text-slate-300 hover:border-orange-200'
                                         : 'bg-white border border-slate-100 text-slate-400 hover:border-orange-200 hover:shadow-md'
                                     }`}
                             >
-                                <span className={`text-[10px] uppercase tracking-wider font-bold mb-1 ${isSelected ? 'text-orange-100' : 'text-slate-400'}`}>
+                                <span className={`text-xs uppercase tracking-wider font-bold mb-1 ${isSelected ? 'text-orange-100' : 'text-slate-400'}`}>
                                     {dayName}
                                 </span>
                                 <span className={`text-xl font-black tracking-tighter ${isSelected ? 'text-white' : isFuture ? 'text-slate-300' : 'text-slate-800'}`}>
@@ -634,7 +634,7 @@ export default function DashboardPage() {
             <div className="px-6 space-y-16 mt-6">
 
                 {/* CALORIES SECTION */}
-                <div className="bg-white rounded-[2rem] py-6 px-6 shadow-sm border border-slate-100 mb-6 mx-6">
+                <div className="bg-white rounded-[2rem] py-6 px-6 ui-card border border-slate-100 mb-6 mx-6">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-lg font-bold text-slate-900">Energy Balance</h2>
                         <span className="text-sm font-bold text-[#f97316]">Today</span>
@@ -648,7 +648,7 @@ export default function DashboardPage() {
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
                                 <span className="text-3xl font-black text-slate-900 tracking-tighter leading-none">{animatedKcal}</span>
-                                <span className="text-[10px] font-bold text-slate-400 mt-1">/ {targetKcal} kcal</span>
+                                <span className="text-xs font-bold text-slate-400 mt-1">/ {targetKcal} kcal</span>
                             </div>
                         </div>
                         {/* Macros */}
@@ -688,7 +688,7 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-2 gap-4 px-6 mb-8 mt-[-1rem]">
                     {/* Hydration */}
                     <div onClick={() => isToday && setIsWaterModalOpen(true)}
-                        className={`bg-white rounded-[2rem] p-5 shadow-sm border border-slate-100 flex flex-col justify-between transition-colors h-48 ${isToday ? 'cursor-pointer hover:border-blue-200' : 'cursor-default'}`}>
+                        className={`bg-white rounded-[2rem] p-5 ui-card border border-slate-100 flex flex-col justify-between transition-colors h-48 ${isToday ? 'cursor-pointer hover:border-blue-200' : 'cursor-default'}`}>
                         <div className="flex items-center gap-2 mb-2">
                             <div className="bg-blue-50 p-1.5 rounded-full">
                                 <Droplet size={16} className="text-blue-500 fill-blue-500" />
@@ -699,13 +699,13 @@ export default function DashboardPage() {
                             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-blue-200 to-blue-100 opacity-60 transition-all duration-1000 ease-out" style={{ height: `${hydrationPercentage}%` }}></div>
                             <div className="relative z-10 flex flex-col items-center mt-2">
                                 <span className="text-2xl font-black text-slate-900 tracking-tighter leading-none">{currentLiters}L</span>
-                                <span className="text-[10px] font-medium text-slate-500 mt-1">Goal {(targetWaterMl / 1000).toFixed(1)}L</span>
+                                <span className="text-xs font-medium text-slate-500 mt-1">Goal {(targetWaterMl / 1000).toFixed(1)}L</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Weight + BMI */}
-                    <div className="bg-white rounded-[2rem] p-5 shadow-sm border border-slate-100 flex flex-col gap-3 h-48">
+                    <div className="bg-white rounded-[2rem] p-5 ui-card border border-slate-100 flex flex-col gap-3 h-48">
                         <div className="flex items-center gap-2">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#f97316]">
                                 <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
@@ -718,12 +718,12 @@ export default function DashboardPage() {
                             <span className="text-xs font-bold text-slate-400">kg</span>
                         </div>
                         {weeklyWeightChange !== null ? (
-                            <p className={`text-[10px] font-bold flex items-center gap-1 ${weeklyWeightChange <= 0 ? 'text-[#22c55e]' : 'text-rose-500'}`}>
+                            <p className={`text-xs font-bold flex items-center gap-1 ${weeklyWeightChange <= 0 ? 'text-[#22c55e]' : 'text-rose-500'}`}>
                                 <ArrowDown size={10} strokeWidth={3} className={weeklyWeightChange > 0 ? 'rotate-180' : ''} />
                                 {weeklyWeightChange > 0 ? '+' : ''}{weeklyWeightChange}kg this week
                             </p>
                         ) : (
-                            <p className="text-[10px] font-medium text-slate-400">No data yet</p>
+                            <p className="text-xs font-medium text-slate-400">No data yet</p>
                         )}
                         {(() => {
                             const w = profile?.current_weight;
@@ -740,7 +740,7 @@ export default function DashboardPage() {
                             return (
                                 <div className="flex items-center gap-1.5 mt-auto">
                                     <span className="text-xs font-black text-slate-900">BMI {bmi}</span>
-                                    <span className={`text-[10px] font-bold ${color}`}>· {label}</span>
+                                    <span className={`text-xs font-bold ${color}`}>· {label}</span>
                                 </div>
                             );
                         })()}
@@ -758,7 +758,7 @@ export default function DashboardPage() {
                             <button
                                 onClick={handleGeneratePlan}
                                 disabled={generatingPlan || !profile}
-                                className="flex items-center gap-1.5 border text-[11px] font-black px-3 py-1.5 rounded-full transition-all active:scale-95 disabled:opacity-40 bg-orange-50 hover:bg-orange-100 text-[#f97316] border-orange-200"
+                                className="flex items-center gap-1.5 border text-xs font-black px-3 py-1.5 rounded-full transition-all active:scale-95 disabled:opacity-40 bg-orange-50 hover:bg-orange-100 text-[#f97316] border-orange-200"
                             >
                                 {generatingPlan
                                     ? <Loader2 size={12} className="animate-spin" />
@@ -769,7 +769,7 @@ export default function DashboardPage() {
                             <button
                                 onClick={handleGeneratePremiumPlan}
                                 disabled={generatingPremiumPlan || !profile}
-                                className={`flex items-center gap-2 border text-[11px] font-black px-3 py-1.5 rounded-full transition-all active:scale-95 ${isPremiumActive
+                                className={`flex items-center gap-2 border text-xs font-black px-3 py-1.5 rounded-full transition-all active:scale-95 ${isPremiumActive
                                     ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200'
                                     : 'bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-200'
                                     } disabled:opacity-40`}
@@ -811,12 +811,12 @@ export default function DashboardPage() {
                                     {activeDay.nutritionTip && (
                                         <div className="relative animate-in fade-in slide-in-from-bottom-2 duration-500">
                                             <div className="absolute -left-[25px] top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-[#f97316] ring-[6px] ring-[#f8f9fa] z-10"></div>
-                                            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 ml-4">
+                                            <div className="bg-white rounded-2xl p-4 ui-card border border-slate-100 ml-4">
                                                 <div className="flex items-center gap-4 w-full">
                                                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-xl shadow-inner">💡</div>
                                                     <div className="flex-1 min-w-0">
                                                         <h4 className="text-sm font-bold text-slate-900">Coach&apos;s Tip</h4>
-                                                        <p className="text-[11px] text-slate-500 font-medium mt-0.5 pr-2 leading-relaxed">{activeDay.nutritionTip}</p>
+                                                        <p className="text-xs text-slate-500 font-medium mt-0.5 pr-2 leading-relaxed">{activeDay.nutritionTip}</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -828,14 +828,14 @@ export default function DashboardPage() {
                                             <div className="absolute -left-[25px] top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-slate-200 ring-[6px] ring-[#f8f9fa] z-10"></div>
                                             <div
                                                 onClick={() => setIsWorkoutBriefOpen(true)}
-                                                className={`bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col ml-4 transition-colors group hover:border-[#f97316]/50 cursor-pointer`}
+                                                className={`bg-white rounded-2xl p-4 ui-card border border-slate-100 flex flex-col ml-4 transition-colors group hover:border-[#f97316]/50 cursor-pointer`}
                                             >
                                                 <div className="flex items-start justify-between mb-3">
                                                     <div className="flex items-center gap-4">
                                                         <div className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-xl shadow-inner">🔥</div>
                                                         <div>
                                                             <h4 className="text-sm font-bold text-slate-900 group-hover:text-[#f97316] transition-colors">{activeDay.focusArea || "Today's Workout"}</h4>
-                                                            <p className="text-[11px] text-slate-500 font-medium mt-0.5">{activeDay.exercises.length} movements scheduled</p>
+                                                            <p className="text-xs text-slate-500 font-medium mt-0.5">{activeDay.exercises.length} movements scheduled</p>
                                                         </div>
                                                     </div>
                                                     <div className="w-7 h-7 rounded-full bg-slate-50 border border-slate-100 text-slate-400 flex items-center justify-center mr-1">
@@ -844,13 +844,13 @@ export default function DashboardPage() {
                                                 </div>
                                                 <div className="space-y-1.5 pl-14">
                                                     {activeDay.exercises.slice(0, 3).map((ex: { name: string; sets?: number; durationOrReps: string }, idx: number) => (
-                                                        <div key={idx} className="flex justify-between items-end text-[11px] border-b border-slate-50 pb-1.5 last:border-0 last:pb-0">
+                                                        <div key={idx} className="flex justify-between items-end text-xs border-b border-slate-50 pb-1.5 last:border-0 last:pb-0">
                                                             <span className="font-bold text-slate-700">{ex.name}</span>
                                                             <span className="text-slate-400 font-bold bg-slate-50 px-2 py-0.5 rounded-md">{ex.sets ? `${ex.sets}x ` : ''}{ex.durationOrReps}</span>
                                                         </div>
                                                     ))}
                                                     {activeDay.exercises.length > 3 && (
-                                                        <p className="text-[10px] text-slate-400 font-medium italic pt-1">+{activeDay.exercises.length - 3} more...</p>
+                                                        <p className="text-xs text-slate-400 font-medium italic pt-1">+{activeDay.exercises.length - 3} more...</p>
                                                     )}
                                                 </div>
                                             </div>
@@ -860,11 +860,11 @@ export default function DashboardPage() {
                                     {activeDay.type === 'rest' && (
                                         <div className="relative animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
                                             <div className="absolute -left-[25px] top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-slate-200 ring-[6px] ring-[#f8f9fa] z-10"></div>
-                                            <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center gap-4 ml-4">
+                                            <div className="bg-white rounded-2xl p-4 ui-card border border-slate-100 flex items-center gap-4 ml-4">
                                                 <div className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-xl shadow-inner">🧘</div>
                                                 <div>
                                                     <h4 className="text-sm font-bold text-slate-900">Active Recovery</h4>
-                                                    <p className="text-[11px] text-slate-500 font-medium mt-0.5">Focus on mobility and stretching.</p>
+                                                    <p className="text-xs text-slate-500 font-medium mt-0.5">Focus on mobility and stretching.</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -894,7 +894,7 @@ export default function DashboardPage() {
             {
                 isMealModalOpen && (
                     <div className="fixed inset-0 bg-slate-900/40 z-[60] flex items-end sm:items-center justify-center p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200">
-                        <div className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-sm max-h-[85vh] overflow-y-auto pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-xl border border-slate-100">
+                        <div className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-sm max-h-[85vh] overflow-y-auto pb-[calc(1.25rem+env(safe-area-inset-bottom))] ui-elevated border border-slate-100">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="font-bold text-lg text-slate-900">Log Meal</h3>
                                 <button onClick={() => setIsMealModalOpen(false)} className="text-slate-400 hover:text-slate-600 bg-slate-100 rounded-full p-2">
@@ -918,7 +918,7 @@ export default function DashboardPage() {
 
                             <button
                                 onClick={handleSaveMealLog}
-                                className="w-full bg-[#f97316] hover:bg-orange-600 text-white font-extrabold py-4 rounded-xl transition-colors shadow-lg shadow-orange-500/30"
+                                className="w-full bg-[#f97316] hover:bg-orange-600 text-white font-extrabold py-4 rounded-xl transition-colors ui-elevated "
                             >
                                 Save Meal Log
                             </button>
@@ -935,7 +935,7 @@ export default function DashboardPage() {
                             className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in"
                             onClick={() => setIsWaterModalOpen(false)}
                         ></div>
-                        <div className="bg-white rounded-[2rem] p-5 sm:p-6 w-full max-w-sm max-h-[85vh] overflow-y-auto pb-[calc(1.25rem+env(safe-area-inset-bottom))] relative z-10 shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="bg-white rounded-[2rem] p-5 sm:p-6 w-full max-w-sm max-h-[85vh] overflow-y-auto pb-[calc(1.25rem+env(safe-area-inset-bottom))] relative z-10 ui-elevated animate-in zoom-in-95 duration-200">
                             <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-4 mx-auto border border-blue-100">
                                 <Droplet className="text-blue-500" size={24} />
                             </div>
@@ -966,7 +966,7 @@ export default function DashboardPage() {
                                     onClick={submitCustomWater}
                                     disabled={!waterInputMl || isNaN(parseInt(waterInputMl))}
                                     style={{ WebkitTapHighlightColor: 'transparent', outline: 'none' }}
-                                    className="py-3 rounded-xl font-bold text-white bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 disabled:pointer-events-none transition-colors shadow-lg shadow-orange-500/30 border-none outline-none focus:outline-none focus:ring-0 focus-visible:outline-none"
+                                    className="py-3 rounded-xl font-bold text-white bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 disabled:pointer-events-none transition-colors ui-elevated  border-none outline-none focus:outline-none focus:ring-0 focus-visible:outline-none"
                                 >
                                     Log It
                                 </button>
@@ -984,7 +984,7 @@ export default function DashboardPage() {
                             className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in"
                             onClick={() => setIsWorkoutBriefOpen(false)}
                         ></div>
-                        <div className="bg-white rounded-[2rem] p-5 sm:p-6 w-full max-w-md relative z-10 shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[88vh] pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+                        <div className="bg-white rounded-[2rem] p-5 sm:p-6 w-full max-w-md relative z-10 ui-elevated animate-in zoom-in-95 duration-200 flex flex-col max-h-[88vh] pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
                             {/* Header */}
                             <div className="flex justify-between items-center mb-6">
                                 <div className="flex items-center gap-3">
@@ -1006,14 +1006,14 @@ export default function DashboardPage() {
                                 {plan.days[selectedOffset].exercises?.map((ex: any, idx: number) => (
                                     <div key={idx} className="bg-slate-50 border border-slate-100 rounded-2xl p-3.5 sm:p-4 flex justify-between items-center group hover:border-[#f97316]/30 transition-colors">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-[10px] font-black text-slate-400 shadow-sm">
+                                            <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-xs font-black text-slate-400 ui-card">
                                                 {idx + 1}
                                             </div>
                                             <span className="font-bold text-slate-700">{ex.name}</span>
                                         </div>
                                         <div className="text-right">
                                             <span className="block text-[#f97316] font-black text-[12px] sm:text-[13px]">{ex.durationOrReps}</span>
-                                            {ex.sets && <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{ex.sets} Sets</span>}
+                                            {ex.sets && <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{ex.sets} Sets</span>}
                                         </div>
                                     </div>
                                 ))}
@@ -1033,7 +1033,7 @@ export default function DashboardPage() {
                                     ) : (
                                         <Link
                                             href="/log?plan=today"
-                                            className="w-full bg-[#f97316] hover:bg-orange-600 text-white font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-orange-500/30"
+                                            className="w-full bg-[#f97316] hover:bg-orange-600 text-white font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 transition-colors ui-elevated "
                                         >
                                             <span>Start Workout</span>
                                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
@@ -1062,7 +1062,7 @@ export default function DashboardPage() {
             {isNoticeOpen && (
                 <div className="fixed inset-0 z-[85] flex items-center justify-center px-5">
                     <div className="absolute inset-0 bg-slate-900/45 backdrop-blur-sm" onClick={() => setIsNoticeOpen(false)} />
-                    <div className="relative w-full max-w-md bg-white rounded-[1.5rem] p-5 border border-slate-100 shadow-2xl">
+                    <div className="relative w-full max-w-md bg-white rounded-[1.5rem] p-5 border border-slate-100 ui-elevated">
                         <button
                             onClick={() => setIsNoticeOpen(false)}
                             className="absolute right-3 top-3 w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"
@@ -1087,3 +1087,4 @@ export default function DashboardPage() {
         </div >
     );
 }
+

@@ -179,7 +179,7 @@ export default function ProfilePage() {
                 </div>
                 <button
                     onClick={openEditModal}
-                    className="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-2 text-xs font-bold text-slate-700 hover:border-[#f97316] hover:text-[#f97316] transition-colors shadow-sm"
+                    className="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-2 text-xs font-bold text-slate-700 hover:border-[#f97316] hover:text-[#f97316] transition-colors ui-card"
                 >
                     <Pencil size={12} />
                     Edit Profile
@@ -187,8 +187,8 @@ export default function ProfilePage() {
             </div>
 
             {/* Avatar Card */}
-            <div className="mx-6 mb-6 bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 flex items-center gap-5">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-[#f97316] flex items-center justify-center shadow-lg shadow-orange-500/30 flex-shrink-0">
+            <div className="mx-6 mb-6 bg-white rounded-[2rem] p-6 ui-card border border-slate-100 flex items-center gap-5">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-[#f97316] flex items-center justify-center ui-elevated  flex-shrink-0">
                     <UserIcon size={28} className="text-white" strokeWidth={2.5} />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -199,7 +199,7 @@ export default function ProfilePage() {
                     {isPremiumActive && (
                         <div className="flex items-center gap-1.5 mt-1">
                             <Crown size={12} className="text-amber-500" />
-                            <span className="text-[11px] font-bold text-amber-600">
+                            <span className="text-xs font-bold text-amber-600">
                                 Premium · Expires {premiumUntilLabel}
                             </span>
                         </div>
@@ -207,14 +207,14 @@ export default function ProfilePage() {
                     {!isPremiumActive && (
                         <div className="flex items-center gap-1.5 mt-1">
                             <Calendar size={12} className="text-slate-500" />
-                            <span className="text-[11px] font-bold text-slate-600">
+                            <span className="text-xs font-bold text-slate-600">
                                 Free Trial · {trialDaysLeft > 0 ? `${trialDaysLeft} day${trialDaysLeft > 1 ? 's' : ''} left` : 'Ended'}
                             </span>
                         </div>
                     )}
                     <div className="flex items-center gap-1.5 mt-2">
                         <Calendar size={12} className="text-[#f97316]" />
-                        <span className="text-[11px] font-bold text-[#f97316]">
+                        <span className="text-xs font-bold text-[#f97316]">
                             {profile?.goal_weight && profile?.current_weight
                                 ? `${Math.abs(profile.current_weight - profile.goal_weight).toFixed(1)} kg to goal`
                                 : 'Set your goal'}
@@ -229,11 +229,11 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-2 gap-3">
                     {loading
                         ? Array.from({ length: 4 }).map((_, i) => (
-                            <div key={i} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 h-20 animate-pulse" />
+                            <div key={i} className="bg-white rounded-2xl p-4 ui-card border border-slate-100 h-20 animate-pulse" />
                         ))
                         : statCards.map((s, i) => (
-                            <div key={i} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-                                <div className="flex items-center gap-2 mb-2">{s.icon}<span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{s.label}</span></div>
+                            <div key={i} className="bg-white rounded-2xl p-4 ui-card border border-slate-100">
+                                <div className="flex items-center gap-2 mb-2">{s.icon}<span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{s.label}</span></div>
                                 <p className="text-base font-black text-slate-800 capitalize">{s.value}</p>
                             </div>
                         ))
@@ -243,12 +243,12 @@ export default function ProfilePage() {
 
             {/* Achievement Badge */}
             <div className="mx-6 mb-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-[2rem] p-5 border border-orange-100 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm border border-orange-100 flex-shrink-0">
+                <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center ui-card border border-orange-100 flex-shrink-0">
                     <Trophy size={22} className="text-[#f97316]" />
                 </div>
                 <div>
                     <p className="text-sm font-black text-slate-900">Keep it up! 🏆</p>
-                    <p className="text-[11px] font-medium text-slate-500 mt-0.5">
+                    <p className="text-xs font-medium text-slate-500 mt-0.5">
                         Stay consistent with your daily protocol to hit your goal.
                     </p>
                 </div>
@@ -257,7 +257,7 @@ export default function ProfilePage() {
             {/* Account Actions */}
             <div className="px-6 mb-6">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Account</p>
-                <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden divide-y divide-slate-50">
+                <div className="bg-white rounded-[2rem] ui-card border border-slate-100 overflow-hidden divide-y divide-slate-50">
                     {user?.is_admin && (
                         <button
                             onClick={() => router.push('/admin')}
@@ -304,7 +304,7 @@ export default function ProfilePage() {
                 <div className="fixed inset-0 z-[70] flex items-end justify-center" onClick={() => setEditModal(false)}>
                     <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
                     <div
-                        className="relative bg-white rounded-t-[2rem] w-full max-w-md px-6 pt-6 pb-10 shadow-2xl animate-in slide-in-from-bottom duration-300"
+                        className="relative bg-white rounded-t-[2rem] w-full max-w-md px-6 pt-6 pb-10 ui-elevated animate-in slide-in-from-bottom duration-300"
                         onClick={e => e.stopPropagation()}
                     >
                         {/* Drag handle */}
@@ -331,7 +331,7 @@ export default function ProfilePage() {
                             <div className="space-y-5">
                                 {/* Name */}
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1">Display Name</label>
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider pl-1">Display Name</label>
                                     <input
                                         type="text"
                                         value={editName}
@@ -344,7 +344,7 @@ export default function ProfilePage() {
                                 {/* Weight fields side by side */}
                                 <div className="grid grid-cols-2 gap-3">
                                     <div>
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1">Current Weight</label>
+                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider pl-1">Current Weight</label>
                                         <div className="relative mt-1">
                                             <input
                                                 type="number"
@@ -358,7 +358,7 @@ export default function ProfilePage() {
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1">Goal Weight</label>
+                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider pl-1">Goal Weight</label>
                                         <div className="relative mt-1">
                                             <input
                                                 type="number"
@@ -375,7 +375,7 @@ export default function ProfilePage() {
 
                                 {/* Activity Level */}
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1">Activity Level</label>
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider pl-1">Activity Level</label>
                                     <div className="grid grid-cols-2 gap-2 mt-2">
                                         {ACTIVITY_OPTIONS.map(opt => (
                                             <button
@@ -401,7 +401,7 @@ export default function ProfilePage() {
                                 <button
                                     onClick={handleSaveProfile}
                                     disabled={editLoading}
-                                    className="w-full py-3.5 bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 text-white text-sm font-black rounded-2xl transition-all active:scale-95 shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2"
+                                    className="w-full py-3.5 bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 text-white text-sm font-black rounded-2xl transition-all active:scale-95 ui-elevated  flex items-center justify-center gap-2"
                                 >
                                     {editLoading ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : 'Save Changes'}
                                 </button>
@@ -417,7 +417,7 @@ export default function ProfilePage() {
                     onClick={() => setPwModal(false)}>
                     <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
                     <div
-                        className="relative bg-white rounded-[2rem] p-6 w-full shadow-2xl animate-in zoom-in-95 duration-200"
+                        className="relative bg-white rounded-[2rem] p-6 w-full ui-elevated animate-in zoom-in-95 duration-200"
                         onClick={e => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-6">
@@ -439,7 +439,7 @@ export default function ProfilePage() {
                         ) : (
                             <div className="space-y-3">
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1">Current Password</label>
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider pl-1">Current Password</label>
                                     <div className="relative mt-1">
                                         <input
                                             type={showOld ? 'text' : 'password'}
@@ -455,7 +455,7 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1">New Password</label>
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider pl-1">New Password</label>
                                     <div className="relative mt-1">
                                         <input
                                             type={showNew ? 'text' : 'password'}
@@ -471,7 +471,7 @@ export default function ProfilePage() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1">Confirm New Password</label>
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider pl-1">Confirm New Password</label>
                                     <input
                                         type="password"
                                         value={confirmPw}
@@ -486,7 +486,7 @@ export default function ProfilePage() {
                                 <button
                                     onClick={handleChangePassword}
                                     disabled={pwLoading}
-                                    className="w-full mt-2 py-3.5 bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 text-white text-sm font-black rounded-2xl transition-all active:scale-95 shadow-lg shadow-orange-500/30"
+                                    className="w-full mt-2 py-3.5 bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 text-white text-sm font-black rounded-2xl transition-all active:scale-95 ui-elevated "
                                 >
                                     {pwLoading ? 'Updating...' : 'Update Password'}
                                 </button>
@@ -499,3 +499,4 @@ export default function ProfilePage() {
         </div>
     );
 }
+
