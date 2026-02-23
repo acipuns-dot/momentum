@@ -14,10 +14,23 @@ dotenv.config({ path: '../frontend/.env.local' });
 const app = express();
 const PORT = process.env.PORT || 8080;
 const PB_URL = process.env.NEXT_PUBLIC_POCKETBASE_URL || 'http://127.0.0.1:8090';
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || process.env.FRONTEND_ORIGIN || 'http://localhost:3000')
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || process.env.FRONTEND_ORIGIN || 'http://localhost:3000,https://*.vercel.app')
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
+
+const isOriginAllowed = (origin: string) => {
+    return allowedOrigins.some((allowed) => {
+        // Wildcard support: https://*.vercel.app
+        if (allowed.includes('*')) {
+            const [scheme, hostPattern] = allowed.split('://');
+            if (!scheme || !hostPattern) return false;
+            const prefix = hostPattern.replace('*.', '');
+            return origin.startsWith(`${scheme}://`) && origin.endsWith(`.${prefix}`);
+        }
+        return origin === allowed;
+    });
+};
 
 // Log startup config (masking keys)
 console.log('--- Startup Config ---');
@@ -30,7 +43,7 @@ console.log('--- end ---');
 
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) {
+        if (!origin || isOriginAllowed(origin)) {
             callback(null, true);
             return;
         }
