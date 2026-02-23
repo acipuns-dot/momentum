@@ -725,12 +725,13 @@ export default function DashboardPage() {
                             </div>
                             <span className="text-sm font-bold text-slate-800">Hydration</span>
                         </div>
-                        <div className="w-full flex-1 mt-2 relative bg-blue-50/50 rounded-2xl overflow-hidden flex flex-col items-center justify-center border border-blue-100/50">
-                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-blue-200 to-blue-100 opacity-60 transition-all duration-1000 ease-out" style={{ height: `${hydrationPercentage}%` }}></div>
+                        <div className="w-full flex-1 mt-2 relative bg-slate-900/70 rounded-2xl overflow-hidden flex flex-col items-center justify-center border border-slate-700/45">
+                            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-sky-600/55 via-sky-400/45 to-cyan-300/35 transition-all duration-1000 ease-out" style={{ height: `${hydrationPercentage}%` }}></div>
                             <div className="relative z-10 flex flex-col items-center mt-2">
-                                <span className="text-2xl font-black text-slate-900 tracking-tighter leading-none">{currentLiters}L</span>
-                                <span className="text-xs font-medium text-slate-500 mt-1">Goal {(targetWaterMl / 1000).toFixed(1)}L</span>
+                                <span className="text-2xl font-black text-slate-100 tracking-tighter leading-none">{currentLiters}L</span>
+                                <span className="text-xs font-medium text-slate-400 mt-1">Goal {(targetWaterMl / 1000).toFixed(1)}L</span>
                             </div>
+                            <span className="absolute top-2 right-2 text-[10px] font-black px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-200 border border-sky-300/25">{hydrationPercentage}%</span>
                         </div>
                     </div>
 
