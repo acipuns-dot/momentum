@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { getPB } from '@/lib/pb';
 import {
     LogOut, Scale, Target, Flame, Droplets, User as UserIcon,
-    ChevronRight, Trophy, Calendar, Lock, X, Eye, EyeOff, CheckCircle2,
+    ChevronRight, Trophy, Calendar, Lock, X, Eye, EyeOff, CheckCircle2, Crown,
     Pencil, Loader2
 } from 'lucide-react';
 
@@ -157,6 +157,12 @@ export default function ProfilePage() {
         },
     ];
 
+    const premiumUntil = user?.premium_until ? new Date(user.premium_until) : null;
+    const isPremiumActive = !!user?.is_premium && !!premiumUntil && premiumUntil.getTime() > Date.now();
+    const premiumUntilLabel = premiumUntil
+        ? premiumUntil.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        : null;
+
     return (
         <div className="min-h-screen bg-[#f8f9fa] pb-32 font-sans max-w-md mx-auto">
 
@@ -185,6 +191,14 @@ export default function ProfilePage() {
                         {user?.name || user?.email?.split('@')[0] || 'User'}
                     </p>
                     <p className="text-xs font-medium text-slate-400 truncate mt-0.5">{user?.email}</p>
+                    {isPremiumActive && (
+                        <div className="flex items-center gap-1.5 mt-1">
+                            <Crown size={12} className="text-amber-500" />
+                            <span className="text-[11px] font-bold text-amber-600">
+                                Premium · Expires {premiumUntilLabel}
+                            </span>
+                        </div>
+                    )}
                     <div className="flex items-center gap-1.5 mt-2">
                         <Calendar size={12} className="text-[#f97316]" />
                         <span className="text-[11px] font-bold text-[#f97316]">
