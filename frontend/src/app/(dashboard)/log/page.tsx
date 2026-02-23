@@ -96,6 +96,19 @@ const parseDurationSeconds = (text: string): number | null => {
     return null;
 };
 
+const parseRepCount = (text: string): number | null => {
+    const t = text.toLowerCase();
+    const rangeMatch = t.match(/(\d+)\s*[-–]\s*(\d+)\s*reps?/);
+    if (rangeMatch) {
+        return Math.max(parseInt(rangeMatch[1], 10), parseInt(rangeMatch[2], 10));
+    }
+    const singleMatch = t.match(/(\d+)\s*reps?/);
+    if (singleMatch) return parseInt(singleMatch[1], 10);
+    return null;
+};
+
+const roundUpToFive = (secs: number): number => Math.ceil(secs / 5) * 5;
+
 const isStrengthLikeExercise = (name: string): boolean => {
     const n = name.toLowerCase();
     return /(squat|deadlift|bench|press|row|curl|lunge|pull|push|raise|extension|fly)/.test(n);
@@ -164,10 +177,12 @@ export default function WorkoutLoggerPage() {
         : 'timed';
     const currentStrengthLike = !!currentGuidedExercise && isStrengthLikeExercise(currentGuidedExercise.name);
     const parsedDurationSecs = currentGuidedExercise ? parseDurationSeconds(currentGuidedExercise.durationOrReps) : null;
+    const parsedRepCount = currentGuidedExercise ? parseRepCount(currentGuidedExercise.durationOrReps) : null;
     const minWorkSecs = currentStrengthLike ? 40 : 20;
+    const repsEstimatedSecs = parsedRepCount ? roundUpToFive(Math.max(20, parsedRepCount * 2.2)) : roundUpToFive(Math.max(20, guidedConfig.workSecs));
     const guidedWorkSecs = currentEffectiveMode === 'timed'
         ? Math.max(guidedConfig.workSecs, minWorkSecs, parsedDurationSecs || 0)
-        : guidedConfig.workSecs;
+        : repsEstimatedSecs;
     const guidedRestSecs = guidedConfig.restSecs;
     const guidedTargetRounds = currentEffectiveMode === 'reps'
         ? Math.max(currentGuidedExercise?.sets || 3, 1)
@@ -373,9 +388,9 @@ export default function WorkoutLoggerPage() {
         return () => clearTimeout(t);
     }, [guidedTabataEnabled, phase, running, guidedStartCountdown]);
 
-    // Guided interval engine for timed mode.
+    // Guided interval engine (timed + reps auto progression).
     useEffect(() => {
-        if (!guidedTabataEnabled || !running || phase !== 'guided_active' || !dailyPlan || guidedStartCountdown > 0 || currentEffectiveMode !== 'timed') return;
+        if (!guidedTabataEnabled || !running || phase !== 'guided_active' || !dailyPlan || guidedStartCountdown > 0) return;
         const tick = setInterval(() => {
             setGuidedIntervalElapsed(prev => {
                 const limit = guidedIntervalState === 'work' ? guidedWorkSecs : guidedRestSecs;
@@ -410,23 +425,7 @@ export default function WorkoutLoggerPage() {
             });
         }, 1000);
         return () => clearInterval(tick);
-    }, [guidedTabataEnabled, running, phase, dailyPlan, guidedIntervalState, guidedCurrentRound, currentExerciseIndex, guidedStartCountdown, currentEffectiveMode, guidedWorkSecs, guidedRestSecs, guidedTargetRounds]);
-
-    // Reps mode: only runs rest countdown after user completes a set.
-    useEffect(() => {
-        if (!guidedTabataEnabled || !running || phase !== 'guided_active' || !dailyPlan || guidedStartCountdown > 0 || currentEffectiveMode !== 'reps' || guidedIntervalState !== 'rest') return;
-        const tick = setInterval(() => {
-            setGuidedIntervalElapsed(prev => {
-                if (prev + 1 >= guidedRestSecs) {
-                    speakCue('Go');
-                    setGuidedIntervalState('work');
-                    return 0;
-                }
-                return prev + 1;
-            });
-        }, 1000);
-        return () => clearInterval(tick);
-    }, [guidedTabataEnabled, running, phase, dailyPlan, guidedStartCountdown, currentEffectiveMode, guidedIntervalState, guidedRestSecs]);
+    }, [guidedTabataEnabled, running, phase, dailyPlan, guidedIntervalState, guidedCurrentRound, currentExerciseIndex, guidedStartCountdown, guidedWorkSecs, guidedRestSecs, guidedTargetRounds]);
 
     // Pre-start voice countdown: 3, 2, 1.
     useEffect(() => {
@@ -632,32 +631,6 @@ export default function WorkoutLoggerPage() {
                 setGuidedStartCountdown(30);
             }
         }
-    };
-
-    const completeRepsSet = () => {
-        if (!dailyPlan || currentEffectiveMode !== 'reps' || phase !== 'guided_active') return;
-        setGuidedRoundsCompleted(c => c + 1);
-
-        if (guidedCurrentRound >= guidedTargetRounds) {
-            if (currentExerciseIndex < dailyPlan.exercises.length - 1) {
-                setGuidedCompletedExercises(c => c + 1);
-                setCurrentExerciseIndex(i => i + 1);
-                setGuidedCurrentRound(1);
-                setGuidedIntervalState('work');
-                setGuidedIntervalElapsed(0);
-                setGuidedStartCountdown(30);
-                guidedMilestoneVoiceRef.current = '';
-                return;
-            }
-            setGuidedCompletedExercises(c => c + 1);
-            stopWorkout();
-            return;
-        }
-
-        setGuidedCurrentRound(r => r + 1);
-        setGuidedIntervalState('rest');
-        setGuidedIntervalElapsed(0);
-        speakCue('Rest');
     };
 
     const saveLog = async () => {
@@ -1210,13 +1183,11 @@ export default function WorkoutLoggerPage() {
                                     ) : (
                                         <div className="text-center">
                                             <p className={`text-5xl font-black tracking-tight ${guidedIntervalState === 'work' ? 'text-orange-600' : 'text-sky-600'}`}>
-                                                {currentEffectiveMode === 'reps' && guidedIntervalState === 'work'
-                                                    ? currentGuidedExercise?.durationOrReps || 'Set'
-                                                    : Math.max((guidedIntervalState === 'work' ? guidedWorkSecs : guidedRestSecs) - guidedIntervalElapsed, 0)}
+                                                {Math.max((guidedIntervalState === 'work' ? guidedWorkSecs : guidedRestSecs) - guidedIntervalElapsed, 0)}
                                             </p>
                                             <p className="text-[11px] text-slate-500 font-semibold mt-1">
                                                 {currentEffectiveMode === 'reps'
-                                                    ? `Tap Complete Set when done. Rest is ${guidedRestSecs}s.`
+                                                    ? `Target: ${currentGuidedExercise?.durationOrReps || 'reps'} · Auto progression`
                                                     : `Auto-advances to next exercise after ${guidedTargetRounds} rounds`}
                                             </p>
                                         </div>
@@ -1286,15 +1257,10 @@ export default function WorkoutLoggerPage() {
                             </button>
 
                             <button
-                                onClick={guidedTabataEnabled && currentEffectiveMode === 'reps' && guidedIntervalState === 'work' ? completeRepsSet : nextExercise}
-                                disabled={guidedTabataEnabled && currentEffectiveMode === 'reps' && guidedIntervalState === 'rest'}
+                                onClick={nextExercise}
                                 className="flex-1 py-4 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white font-extrabold rounded-2xl flex items-center justify-center gap-2 transition-transform shadow-xl active:scale-95 text-lg"
                             >
-                                {guidedTabataEnabled && currentEffectiveMode === 'reps' && guidedIntervalState === 'work' ? (
-                                    <><CheckCircle size={20} /> Complete Set</>
-                                ) : guidedTabataEnabled && currentEffectiveMode === 'reps' && guidedIntervalState === 'rest' ? (
-                                    <>Rest {Math.max(guidedRestSecs - guidedIntervalElapsed, 0)}s</>
-                                ) : currentExerciseIndex === dailyPlan.exercises.length - 1 ? (
+                                {currentExerciseIndex === dailyPlan.exercises.length - 1 ? (
                                     <><CheckCircle size={20} /> Finish Workout</>
                                 ) : (
                                     <>Next <ChevronRight size={20} /></>
