@@ -82,6 +82,8 @@ export default function DashboardPage() {
     const [selectedOffset, setSelectedOffset] = useState(0); // selected card offset from today
     const dayRefs = useRef<(HTMLDivElement | null)[]>([]);
     const touchStart = useRef<{ x: number; y: number } | null>(null);
+    const [calendarMotion, setCalendarMotion] = useState<'idle' | 'past' | 'future'>('idle');
+    const calendarMotionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const skipFirstDateEffect = useRef(true);
 
     // Derive selected date string and isToday flag
@@ -93,6 +95,9 @@ export default function DashboardPage() {
     const isToday = selectedOffset === 0;
 
     const shiftCalendar = (dir: 'past' | 'future') => {
+        setCalendarMotion(dir);
+        if (calendarMotionTimer.current) clearTimeout(calendarMotionTimer.current);
+        calendarMotionTimer.current = setTimeout(() => setCalendarMotion('idle'), 220);
         setBaseOffset(b => dir === 'past' ? b - 1 : b + 1);
     };
     const onTouchStart = (e: React.TouchEvent) => {
@@ -118,6 +123,12 @@ export default function DashboardPage() {
         // Short delay to ensure rendering completes before starting transitions
         const timer = setTimeout(() => setIsMounted(true), 100);
         return () => clearTimeout(timer);
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            if (calendarMotionTimer.current) clearTimeout(calendarMotionTimer.current);
+        };
     }, []);
 
     // Count Up Animation Logic
@@ -604,7 +615,14 @@ export default function DashboardPage() {
                     );
                 })()}
                 {/* Cards row */}
-                <div className="flex gap-2 flex-1 justify-between">
+                <div
+                    className={`flex gap-2 flex-1 justify-between transition-all duration-200 ease-out ${calendarMotion === 'past'
+                        ? 'translate-x-2 opacity-85'
+                        : calendarMotion === 'future'
+                            ? '-translate-x-2 opacity-85'
+                            : 'translate-x-0 opacity-100'
+                        }`}
+                >
                     {Array.from({ length: 5 }, (_, i) => {
                         const offset = baseOffset + i;
                         const d = new Date();
