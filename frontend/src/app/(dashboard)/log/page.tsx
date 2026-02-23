@@ -711,7 +711,7 @@ export default function WorkoutLoggerPage() {
 
     // ── Render ─────────────────────────────────────────────────────────────────
     return (
-        <div className="min-h-screen bg-slate-50 font-sans pb-28">
+        <div className="min-h-screen bg-slate-50 font-sans pb-[calc(7rem+env(safe-area-inset-bottom))]">
 
             {/* Header */}
             <div className="bg-white px-6 pt-12 pb-5 border-b border-slate-100 shadow-sm sticky top-0 z-10">
@@ -763,7 +763,7 @@ export default function WorkoutLoggerPage() {
                 )}
             </div>
 
-            <div className="px-6 pt-6 space-y-8">
+            <div className="px-4 sm:px-6 pt-5 space-y-6">
 
                 {/* ══ PHASE: PICK ══════════════════════════════════════════════ */}
                 {phase === 'pick' && (
@@ -1174,30 +1174,30 @@ export default function WorkoutLoggerPage() {
                     <div className="flex flex-col h-full animate-in fade-in duration-300">
 
                         {/* Progress Bar */}
-                        <div className="w-full bg-slate-200 h-1.5 rounded-full mb-6 overflow-hidden">
+                        <div className="w-full bg-slate-200 h-1.5 rounded-full mb-4 overflow-hidden">
                             <div
                                 className="h-full bg-[#f97316] transition-all duration-500 ease-out"
                                 style={{ width: `${((currentExerciseIndex) / dailyPlan.exercises.length) * 100}%` }}
                             />
                         </div>
 
-                        <div className="flex-1 flex flex-col items-center">
+                        <div className="flex-1 flex flex-col items-center overflow-y-auto pb-4">
                             <span className="text-xs font-bold text-orange-500 bg-orange-50 px-3 py-1 rounded-full uppercase tracking-widest mb-4">
                                 {currentExerciseIndex + 1} of {dailyPlan.exercises.length}
                             </span>
 
-                            <h2 className="text-2xl font-black text-slate-900 text-center mb-6 leading-tight px-4 w-full">
+                            <h2 className="text-xl sm:text-2xl font-black text-slate-900 text-center mb-4 leading-tight px-2 w-full">
                                 {dailyPlan.exercises[currentExerciseIndex].name}
                             </h2>
 
                             {guidedTabataEnabled && (
-                                <div className={`w-full rounded-3xl p-5 mb-6 border ${guidedIntervalState === 'work' ? 'bg-orange-50 border-orange-200' : 'bg-sky-50 border-sky-200'}`}>
+                                <div className={`w-full rounded-3xl p-4 mb-4 border ${guidedIntervalState === 'work' ? 'bg-orange-50 border-orange-200' : 'bg-sky-50 border-sky-200'}`}>
                                     <div className="flex items-center justify-center gap-2 mb-3">
                                         {(['auto', 'reps', 'timed'] as GuidedExerciseMode[]).map((mode) => (
                                             <button
                                                 key={mode}
                                                 onClick={() => setGuidedExerciseModeByIndex(prev => ({ ...prev, [currentExerciseIndex]: mode }))}
-                                                className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${currentOverrideMode === mode ? 'bg-slate-900 text-white border-slate-900' : 'bg-white/70 text-slate-600 border-slate-200'}`}
+                                                className={`px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider border ${currentOverrideMode === mode ? 'bg-slate-900 text-white border-slate-900' : 'bg-white/70 text-slate-600 border-slate-200'}`}
                                             >
                                                 {mode}
                                             </button>
@@ -1213,9 +1213,9 @@ export default function WorkoutLoggerPage() {
                                     </div>
                                     {guidedStartCountdown > 0 ? (
                                         <div className="text-center">
-                                            <p className="text-[11px] text-slate-500 font-semibold uppercase tracking-wider">Starting In</p>
+                                            <p className="text-[12px] text-slate-500 font-semibold uppercase tracking-wider">Starting In</p>
                                             <p className="text-5xl font-black tracking-tight text-orange-600">{guidedStartCountdown}</p>
-                                            <p className="text-[11px] text-slate-500 font-semibold mt-1">
+                                            <p className="text-[12px] text-slate-600 font-semibold mt-1">
                                                 Get ready. Timer starts with voice countdown.
                                             </p>
                                         </div>
@@ -1224,7 +1224,7 @@ export default function WorkoutLoggerPage() {
                                             <p className={`text-5xl font-black tracking-tight ${guidedIntervalState === 'work' ? 'text-orange-600' : 'text-sky-600'}`}>
                                                 {Math.max((guidedIntervalState === 'work' ? guidedWorkSecs : guidedRestSecs) - guidedIntervalElapsed, 0)}
                                             </p>
-                                            <p className="text-[11px] text-slate-500 font-semibold mt-1">
+                                            <p className="text-[12px] text-slate-600 font-semibold mt-1">
                                                 {currentEffectiveMode === 'reps'
                                                     ? `Target: ${currentGuidedExercise?.durationOrReps || 'reps'} · Auto progression`
                                                     : `Auto-advances to next exercise after ${guidedTargetRounds} rounds`}
@@ -1235,7 +1235,7 @@ export default function WorkoutLoggerPage() {
                             )}
 
                             {/* GIF Display Container */}
-                            <div className="w-full max-w-[280px] aspect-square bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border-4 border-white overflow-hidden relative mb-8 flex items-center justify-center isolate">
+                            <div className="w-full max-w-[240px] sm:max-w-[280px] aspect-square bg-white rounded-[2.2rem] shadow-xl shadow-slate-200/50 border-4 border-white overflow-hidden relative mb-5 flex items-center justify-center isolate">
                                 {dailyPlan.exercises[currentExerciseIndex].isLoadingGif ? (
                                     <div className="flex flex-col items-center gap-3 text-slate-400 animate-pulse">
                                         <Dumbbell size={32} className="opacity-50" />
@@ -1256,16 +1256,16 @@ export default function WorkoutLoggerPage() {
                             </div>
 
                             {/* Sets & Reps Card */}
-                            <div className="w-full bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col items-center justify-center mx-6 mb-6 relative overflow-hidden">
+                            <div className="w-full bg-white rounded-3xl p-4 shadow-sm border border-slate-100 flex flex-col items-center justify-center mb-4 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-4 opacity-5 text-8xl font-black -translate-y-4 translate-x-4">
                                     {dailyPlan.exercises[currentExerciseIndex].sets || 1}
                                 </div>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 z-10">Target</p>
-                                <span className="text-5xl font-black text-[#f97316] tracking-tighter z-10">
+                                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1 z-10">Target</p>
+                                <span className="text-4xl sm:text-5xl font-black text-[#f97316] tracking-tighter z-10">
                                     {dailyPlan.exercises[currentExerciseIndex].durationOrReps}
                                 </span>
                                 {dailyPlan.exercises[currentExerciseIndex].sets && (
-                                    <span className="text-sm font-bold text-slate-600 mt-2 z-10 bg-slate-50 px-4 py-1 rounded-full border border-slate-100">
+                                    <span className="text-[12px] font-bold text-slate-600 mt-2 z-10 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
                                         {dailyPlan.exercises[currentExerciseIndex].sets} Sets
                                     </span>
                                 )}
@@ -1273,9 +1273,9 @@ export default function WorkoutLoggerPage() {
 
                             {/* Instructions Card */}
                             {dailyPlan.exercises[currentExerciseIndex].instructions && dailyPlan.exercises[currentExerciseIndex].instructions!.length > 0 && (
-                                <div className="w-full mx-6 mb-8 px-6">
-                                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 text-center">How to perform</h3>
-                                    <ol className="text-sm text-slate-600 space-y-2 list-decimal list-outside pl-4 text-left font-medium">
+                                <div className="w-full mb-5 px-1">
+                                    <h3 className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-2 text-center">How to perform</h3>
+                                    <ol className="text-[13px] text-slate-600 space-y-2 list-decimal list-outside pl-4 text-left font-medium">
                                         {dailyPlan.exercises[currentExerciseIndex].instructions!.map((step: string, idx: number) => (
                                             <li key={idx} className="leading-relaxed border-b border-slate-100 pb-2 last:border-0">{step}</li>
                                         ))}
@@ -1286,7 +1286,7 @@ export default function WorkoutLoggerPage() {
                         </div>
 
                         {/* Controls */}
-                        <div className="flex items-center justify-between w-full mt-auto pt-4 gap-3">
+                        <div className="sticky bottom-[calc(5.25rem+env(safe-area-inset-bottom))] bg-slate-50/95 backdrop-blur-sm border-t border-slate-100 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 flex items-center justify-between w-auto mt-auto gap-3">
                             <button
                                 onClick={prevExercise}
                                 disabled={currentExerciseIndex === 0}
@@ -1297,7 +1297,7 @@ export default function WorkoutLoggerPage() {
 
                             <button
                                 onClick={nextExercise}
-                                className="flex-1 py-4 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white font-extrabold rounded-2xl flex items-center justify-center gap-2 transition-transform shadow-xl active:scale-95 text-lg"
+                                className="flex-1 py-3.5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white font-extrabold rounded-2xl flex items-center justify-center gap-2 transition-transform shadow-xl active:scale-95 text-base"
                             >
                                 {currentExerciseIndex === dailyPlan.exercises.length - 1 ? (
                                     <><CheckCircle size={20} /> Finish Workout</>
@@ -1314,7 +1314,7 @@ export default function WorkoutLoggerPage() {
             {showGuidedSummary && (
                 <div className="fixed inset-0 z-[85] flex items-center justify-center px-5">
                     <div className="absolute inset-0 bg-slate-900/45 backdrop-blur-sm" onClick={() => setShowGuidedSummary(false)} />
-                    <div className="relative w-full max-w-md bg-white rounded-[1.5rem] p-5 border border-slate-100 shadow-2xl">
+                    <div className="relative w-full max-w-md max-h-[80vh] overflow-y-auto bg-white rounded-[1.5rem] p-5 border border-slate-100 shadow-2xl">
                         <h3 className="text-xl font-black text-slate-900">Workout Summary</h3>
                         <p className="text-sm text-slate-500 font-medium mt-1">Review your session before saving.</p>
                         <div className="grid grid-cols-2 gap-3 mt-4">

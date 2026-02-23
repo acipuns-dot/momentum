@@ -893,8 +893,8 @@ export default function DashboardPage() {
             {/* Meal Logging Modal */}
             {
                 isMealModalOpen && (
-                    <div className="fixed inset-0 bg-slate-900/40 z-[60] flex items-center justify-center p-6 backdrop-blur-sm animate-in fade-in duration-200">
-                        <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-xl border border-slate-100">
+                    <div className="fixed inset-0 bg-slate-900/40 z-[60] flex items-end sm:items-center justify-center p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200">
+                        <div className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-sm max-h-[85vh] overflow-y-auto pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-xl border border-slate-100">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="font-bold text-lg text-slate-900">Log Meal</h3>
                                 <button onClick={() => setIsMealModalOpen(false)} className="text-slate-400 hover:text-slate-600 bg-slate-100 rounded-full p-2">
@@ -905,13 +905,13 @@ export default function DashboardPage() {
                             </div>
 
                             <div className="mb-8">
-                                <label className="block text-sm font-bold text-slate-700 mb-2">Calories (kcal)</label>
+                                <label className="block text-[13px] font-bold text-slate-700 mb-2">Calories (kcal)</label>
                                 <input
                                     type="number"
                                     placeholder="e.g. 450"
                                     value={mealCalories}
                                     onChange={(e) => setMealCalories(e.target.value)}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-xl font-bold text-slate-900 focus:ring-2 focus:ring-[#f97316] focus:outline-none transition-all"
+                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-lg sm:text-xl font-bold text-slate-900 focus:ring-2 focus:ring-[#f97316] focus:outline-none transition-all"
                                     autoFocus
                                 />
                             </div>
@@ -930,17 +930,17 @@ export default function DashboardPage() {
             {/* Water Logging Modal */}
             {
                 isWaterModalOpen && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+                    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center px-4 pb-3 sm:pb-0">
                         <div
                             className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in"
                             onClick={() => setIsWaterModalOpen(false)}
                         ></div>
-                        <div className="bg-white rounded-[2rem] p-6 w-full max-w-sm relative z-10 shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="bg-white rounded-[2rem] p-5 sm:p-6 w-full max-w-sm max-h-[85vh] overflow-y-auto pb-[calc(1.25rem+env(safe-area-inset-bottom))] relative z-10 shadow-2xl animate-in zoom-in-95 duration-200">
                             <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-4 mx-auto border border-blue-100">
                                 <Droplet className="text-blue-500" size={24} />
                             </div>
                             <h3 className="text-xl font-black text-slate-900 text-center mb-2">Log Hydration</h3>
-                            <p className="text-sm text-slate-500 text-center mb-6 font-medium">Enter amount in milliliters.</p>
+                            <p className="text-[13px] text-slate-500 text-center mb-5 font-medium">Enter amount in milliliters.</p>
 
                             <div className="relative mb-6">
                                 <input
@@ -948,7 +948,7 @@ export default function DashboardPage() {
                                     value={waterInputMl}
                                     onChange={(e) => setWaterInputMl(e.target.value)}
                                     placeholder="e.g. 500"
-                                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-4 text-center text-3xl font-black text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-sans"
+                                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-4 py-4 text-center text-2xl sm:text-3xl font-black text-slate-900 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-sans"
                                     autoFocus
                                 />
                                 <span className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 font-bold">ml</span>
@@ -979,12 +979,12 @@ export default function DashboardPage() {
             {/* Workout Brief Modal */}
             {
                 isWorkoutBriefOpen && plan?.days?.[selectedOffset]?.type === 'workout' && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-3 sm:p-4">
                         <div
                             className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in"
                             onClick={() => setIsWorkoutBriefOpen(false)}
                         ></div>
-                        <div className="bg-white rounded-[2rem] p-6 w-full max-w-md relative z-10 shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]">
+                        <div className="bg-white rounded-[2rem] p-5 sm:p-6 w-full max-w-md relative z-10 shadow-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[88vh] pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
                             {/* Header */}
                             <div className="flex justify-between items-center mb-6">
                                 <div className="flex items-center gap-3">
@@ -1004,7 +1004,7 @@ export default function DashboardPage() {
                             {/* Scrollable Content */}
                             <div className="flex-1 overflow-y-auto pr-2 -mr-2 space-y-3 mb-6">
                                 {plan.days[selectedOffset].exercises?.map((ex: any, idx: number) => (
-                                    <div key={idx} className="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex justify-between items-center group hover:border-[#f97316]/30 transition-colors">
+                                    <div key={idx} className="bg-slate-50 border border-slate-100 rounded-2xl p-3.5 sm:p-4 flex justify-between items-center group hover:border-[#f97316]/30 transition-colors">
                                         <div className="flex items-center gap-3">
                                             <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-[10px] font-black text-slate-400 shadow-sm">
                                                 {idx + 1}
@@ -1012,7 +1012,7 @@ export default function DashboardPage() {
                                             <span className="font-bold text-slate-700">{ex.name}</span>
                                         </div>
                                         <div className="text-right">
-                                            <span className="block text-[#f97316] font-black text-[13px]">{ex.durationOrReps}</span>
+                                            <span className="block text-[#f97316] font-black text-[12px] sm:text-[13px]">{ex.durationOrReps}</span>
                                             {ex.sets && <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{ex.sets} Sets</span>}
                                         </div>
                                     </div>
