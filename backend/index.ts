@@ -99,6 +99,7 @@ const GeneratePlanRequestSchema = z.object({
     goalWeight: z.number().positive(),
     equipment: z.array(z.string()).optional(),
     weekOffset: z.number().int().min(0).max(12).optional(),
+    refreshRequested: z.boolean().optional(),
 });
 
 const TogglePremiumRequestSchema = z.object({
@@ -144,7 +145,7 @@ app.post('/generate-plan', async (req: Request, res: Response): Promise<any> => 
             return res.status(400).json({ error: 'Invalid request payload', details: parsedReq.error.flatten() });
         }
 
-        const { currentWeight, goalWeight, equipment, weekOffset = 0 } = parsedReq.data;
+        const { currentWeight, goalWeight, equipment, weekOffset = 0, refreshRequested = false } = parsedReq.data;
         const userId = parsedReq.data.userId || requester.id;
 
         if (userId !== requester.id) {
@@ -171,6 +172,25 @@ app.post('/generate-plan', async (req: Request, res: Response): Promise<any> => 
 
         if (!isPremium && weekOffset > 0) {
             return res.status(403).json({ error: 'Premium is required to generate multi-week plans.' });
+        }
+
+        // Free users can refresh the base weekly plan once per day.
+        if (!isPremium && weekOffset === 0 && refreshRequested) {
+            const dayStart = new Date();
+            dayStart.setHours(0, 0, 0, 0);
+            const dayEnd = new Date(dayStart);
+            dayEnd.setDate(dayEnd.getDate() + 1);
+
+            const todayBasePlans = await pb.collection('weekly_plans_db').getList(1, 1, {
+                filter: `user = "${userId}" && start_date >= "${dayStart.toISOString()}" && start_date < "${dayEnd.toISOString()}"`,
+                sort: '-start_date',
+            });
+
+            if (todayBasePlans.totalItems > 0) {
+                return res.status(429).json({
+                    error: 'Daily refresh limit reached. You can refresh again tomorrow.',
+                });
+            }
         }
 
         const sevenDaysAgo = new Date();

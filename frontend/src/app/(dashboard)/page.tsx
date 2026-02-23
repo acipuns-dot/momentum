@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Target, Droplet, Plus, MoreHorizontal, CheckCircle2, Circle, Loader2, Bell, Clock, Calendar, ArrowDown } from 'lucide-react';
+import { Target, Droplet, Plus, MoreHorizontal, CheckCircle2, Circle, Loader2, Bell, Clock, Calendar, ArrowDown, RotateCcw, Crown } from 'lucide-react';
 import Image from 'next/image';
 import { useAuth } from '@/lib/auth';
 import { getPB } from '@/lib/pb';
@@ -30,6 +30,7 @@ export default function DashboardPage() {
     const [generatingPremiumPlan, setGeneratingPremiumPlan] = useState(false);
     const [weeklyWeightChange, setWeeklyWeightChange] = useState<number | null>(null);
     const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+    const [hasRefreshedToday, setHasRefreshedToday] = useState(false);
 
     // Animation States
     const [animatedKcal, setAnimatedKcal] = useState(0);
@@ -270,6 +271,16 @@ export default function DashboardPage() {
         fetchUserData();
     }, [user]);
 
+    useEffect(() => {
+        if (!user) {
+            setHasRefreshedToday(false);
+            return;
+        }
+        const today = new Date().toISOString().split('T')[0];
+        const lastRefreshDay = localStorage.getItem(`plan_refresh_day_${user.id}`);
+        setHasRefreshedToday(lastRefreshDay === today);
+    }, [user]);
+
     // Re-fetch hydration & nutrition when user taps a different date
     useEffect(() => {
         if (skipFirstDateEffect.current) { skipFirstDateEffect.current = false; return; }
@@ -323,6 +334,10 @@ export default function DashboardPage() {
     // ── Manual plan generation ──────────────────────────────────────────────
     const handleGeneratePlan = async () => {
         if (!user || !profile || generatingPlan) return;
+        if (hasRefreshedToday) {
+            alert('You already refreshed your plan today. Try again tomorrow.');
+            return;
+        }
         setGeneratingPlan(true);
         try {
             const pb = getPB();
@@ -335,13 +350,20 @@ export default function DashboardPage() {
                 body: JSON.stringify({
                     userId: user.id,
                     currentWeight: profile.current_weight,
-                    goalWeight: profile.goal_weight
+                    goalWeight: profile.goal_weight,
+                    refreshRequested: true,
                 })
             });
             if (res.ok) {
                 const data = await res.json();
                 localStorage.setItem('weeklyPlan', JSON.stringify(data));
                 setPlan(data);
+                const today = new Date().toISOString().split('T')[0];
+                localStorage.setItem(`plan_refresh_day_${user.id}`, today);
+                setHasRefreshedToday(true);
+            } else if (res.status === 429) {
+                const payload = await res.json().catch(() => null);
+                alert(payload?.error || 'Daily refresh limit reached. Try again tomorrow.');
             }
         } catch (e) {
             console.error('Plan generation failed', e);
@@ -720,28 +742,40 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => { localStorage.removeItem('weeklyPlan'); handleGeneratePlan(); }}
-                                disabled={generatingPlan || !profile}
-                                className="flex items-center gap-1.5 bg-orange-50 hover:bg-orange-100 disabled:opacity-40 text-[#f97316] border border-orange-200 text-[11px] font-black px-3 py-1.5 rounded-full transition-all active:scale-95"
+                                disabled={generatingPlan || !profile || hasRefreshedToday}
+                                className={`flex items-center gap-1.5 border text-[11px] font-black px-3 py-1.5 rounded-full transition-all active:scale-95 disabled:opacity-40 ${hasRefreshedToday
+                                    ? 'bg-slate-100 text-slate-500 border-slate-200'
+                                    : 'bg-orange-50 hover:bg-orange-100 text-[#f97316] border-orange-200'
+                                    }`}
                             >
                                 {generatingPlan
                                     ? <Loader2 size={12} className="animate-spin" />
-                                    : <span className="text-xs">↻</span>
+                                    : <RotateCcw size={12} />
                                 }
-                                {generatingPlan ? 'Generating...' : 'Regenerate'}
+                                {generatingPlan ? 'Generating...' : hasRefreshedToday ? 'Tomorrow' : 'Refresh Plan'}
                             </button>
                             <button
                                 onClick={handleGeneratePremiumPlan}
                                 disabled={generatingPremiumPlan || !profile}
-                                className={`flex items-center gap-1.5 border text-[11px] font-black px-3 py-1.5 rounded-full transition-all active:scale-95 ${isPremiumActive
-                                    ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-200'
-                                    : 'bg-slate-100 hover:bg-slate-200 text-slate-500 border-slate-200'
+                                className={`flex items-center gap-2 border text-[11px] font-black px-3 py-1.5 rounded-full transition-all active:scale-95 ${isPremiumActive
+                                    ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200'
+                                    : 'bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-200'
                                     } disabled:opacity-40`}
                             >
-                                {generatingPremiumPlan
-                                    ? <Loader2 size={12} className="animate-spin" />
-                                    : <span className="text-xs">Pro</span>
-                                }
-                                {generatingPremiumPlan ? 'Generating...' : '4-Week Pro'}
+                                {generatingPremiumPlan ? (
+                                    <>
+                                        <Loader2 size={12} className="animate-spin" />
+                                        Generating...
+                                    </>
+                                ) : (
+                                    <>
+                                        <span className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full ${isPremiumActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>
+                                            <Crown size={10} />
+                                            Pro
+                                        </span>
+                                        <span>4-Week Plan</span>
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
