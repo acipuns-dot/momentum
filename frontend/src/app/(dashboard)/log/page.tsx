@@ -52,6 +52,7 @@ const INTERVAL_MODES = [
     { id: 'boxing', label: 'Boxing Rounds', desc: '3 min / 1 min rest × 8 rounds (~32 min)', workSecs: 180, restSecs: 60, rounds: 8, kcalRange: '~350–590 kcal' },
     { id: 'endurance', label: 'Endurance', desc: '5 min / 90s rest × 5 rounds (~32 min)', workSecs: 300, restSecs: 90, rounds: 5, kcalRange: '~360–600 kcal' },
 ];
+const GUIDED_TABATA = { workSecs: 20, restSecs: 10, rounds: 8 };
 
 const fmt = (secs: number) => {
     const m = Math.floor(secs / 60).toString().padStart(2, '0');
@@ -89,6 +90,11 @@ export default function WorkoutLoggerPage() {
     const [dailyPlan, setDailyPlan] = useState<DailyPlan | null>(null);
     const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
     const [loadingPlan, setLoadingPlan] = useState(isPlanMode);
+    const [guidedTabataEnabled, setGuidedTabataEnabled] = useState(true);
+    const [guidedIntervalState, setGuidedIntervalState] = useState<'work' | 'rest'>('work');
+    const [guidedIntervalElapsed, setGuidedIntervalElapsed] = useState(0);
+    const [guidedCurrentRound, setGuidedCurrentRound] = useState(1);
+    const guidedVoiceRef = useRef<string>('');
 
     // Generic timer
     const [elapsed, setElapsed] = useState(0);
@@ -297,6 +303,83 @@ export default function WorkoutLoggerPage() {
         }
     }, [phase, running, guidedMusicOn]);
 
+    const speakCue = (text: string) => {
+        if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.02;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        window.speechSynthesis.speak(utterance);
+    };
+
+    // Guided Tabata interval engine (20s work / 10s rest x 8 rounds per exercise)
+    useEffect(() => {
+        if (!guidedTabataEnabled || !running || phase !== 'guided_active' || !dailyPlan) return;
+        const tick = setInterval(() => {
+            setGuidedIntervalElapsed(prev => {
+                const limit = guidedIntervalState === 'work' ? GUIDED_TABATA.workSecs : GUIDED_TABATA.restSecs;
+                if (prev + 1 >= limit) {
+                    if (guidedIntervalState === 'work') {
+                        setGuidedIntervalState('rest');
+                        return 0;
+                    }
+
+                    if (guidedCurrentRound >= GUIDED_TABATA.rounds) {
+                        if (currentExerciseIndex < dailyPlan.exercises.length - 1) {
+                            setCurrentExerciseIndex(i => i + 1);
+                            setGuidedCurrentRound(1);
+                            setGuidedIntervalState('work');
+                            return 0;
+                        }
+                        stopWorkout();
+                        return 0;
+                    }
+
+                    setGuidedCurrentRound(r => r + 1);
+                    setGuidedIntervalState('work');
+                    return 0;
+                }
+                return prev + 1;
+            });
+        }, 1000);
+        return () => clearInterval(tick);
+    }, [guidedTabataEnabled, running, phase, dailyPlan, guidedIntervalState, guidedCurrentRound, currentExerciseIndex]);
+
+    // Guided voice cues for countdown and transitions.
+    useEffect(() => {
+        if (!guidedTabataEnabled || phase !== 'guided_active' || !running) {
+            if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            guidedVoiceRef.current = '';
+            return;
+        }
+
+        const limit = guidedIntervalState === 'work' ? GUIDED_TABATA.workSecs : GUIDED_TABATA.restSecs;
+        const remaining = Math.max(limit - guidedIntervalElapsed, 0);
+
+        if (remaining <= 3 && remaining > 0) {
+            const cue = `${guidedIntervalState}-${remaining}-${guidedCurrentRound}-${currentExerciseIndex}`;
+            if (guidedVoiceRef.current !== cue) {
+                guidedVoiceRef.current = cue;
+                speakCue(String(remaining));
+            }
+            return;
+        }
+
+        if (guidedIntervalElapsed === 0) {
+            const cue = `start-${guidedIntervalState}-${guidedCurrentRound}-${currentExerciseIndex}`;
+            if (guidedVoiceRef.current !== cue) {
+                guidedVoiceRef.current = cue;
+                speakCue(guidedIntervalState === 'work' ? 'Go' : 'Rest');
+            }
+            return;
+        }
+
+        guidedVoiceRef.current = '';
+    }, [guidedTabataEnabled, guidedIntervalState, guidedIntervalElapsed, guidedCurrentRound, currentExerciseIndex, phase, running]);
+
     // 15-second countdown timer
     useEffect(() => {
         if (phase !== 'jump_countdown') return;
@@ -359,6 +442,9 @@ export default function WorkoutLoggerPage() {
 
     const stopWorkout = () => {
         setRunning(false);
+        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
         if (guidedMusicRef.current) {
             guidedMusicRef.current.pause();
         }
@@ -375,12 +461,17 @@ export default function WorkoutLoggerPage() {
         setPhase('pick'); setSelected(null); setElapsed(0); setRunning(false);
         setEffort(7); setNotes(''); setJumpCount(0); setJumpWorkSecs(0);
         setIntervalState('work'); setIntervalElapsed(0); setCurrentRound(1);
+        setGuidedIntervalState('work'); setGuidedIntervalElapsed(0); setGuidedCurrentRound(1);
         if (isPlanMode) router.replace('/log'); // Clear query param
     };
 
     const startGuidedRoutine = () => {
         setPhase('guided_active');
+        setCurrentExerciseIndex(0);
         setElapsed(0);
+        setGuidedIntervalState('work');
+        setGuidedIntervalElapsed(0);
+        setGuidedCurrentRound(1);
         setRunning(true);
         if (guidedMusicOn && guidedMusicRef.current) {
             guidedMusicRef.current.currentTime = 0;
@@ -393,6 +484,9 @@ export default function WorkoutLoggerPage() {
         if (!dailyPlan) return;
         if (currentExerciseIndex < dailyPlan.exercises.length - 1) {
             setCurrentExerciseIndex(prev => prev + 1);
+            setGuidedIntervalState('work');
+            setGuidedIntervalElapsed(0);
+            setGuidedCurrentRound(1);
         } else {
             stopWorkout();
         }
@@ -401,6 +495,9 @@ export default function WorkoutLoggerPage() {
     const prevExercise = () => {
         if (currentExerciseIndex > 0) {
             setCurrentExerciseIndex(prev => prev - 1);
+            setGuidedIntervalState('work');
+            setGuidedIntervalElapsed(0);
+            setGuidedCurrentRound(1);
         }
     };
 
@@ -857,6 +954,21 @@ export default function WorkoutLoggerPage() {
                             </div>
                         </div>
 
+                        <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+                            <button
+                                onClick={() => setGuidedTabataEnabled(v => !v)}
+                                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-colors ${guidedTabataEnabled ? 'bg-orange-50 border-orange-200 text-orange-700' : 'bg-slate-50 border-slate-200 text-slate-600'}`}
+                            >
+                                <span className="text-sm font-black">Tabata Style</span>
+                                <span className="text-xs font-bold">
+                                    {guidedTabataEnabled ? `ON · ${GUIDED_TABATA.workSecs}s/${GUIDED_TABATA.restSecs}s × ${GUIDED_TABATA.rounds}` : 'OFF'}
+                                </span>
+                            </button>
+                            <p className="text-[11px] text-slate-400 font-medium mt-2 px-1">
+                                Voice countdown says 3, 2, 1, Go during guided timer.
+                            </p>
+                        </div>
+
                         <button onClick={startGuidedRoutine}
                             className="w-full py-4 bg-[#f97316] hover:bg-orange-600 text-white font-extrabold rounded-2xl flex items-center justify-center gap-2 transition-colors shadow-lg shadow-orange-500/30 text-lg active:scale-95">
                             <Play size={20} fill="currentColor" /> Let&apos;s Go
@@ -885,6 +997,27 @@ export default function WorkoutLoggerPage() {
                             <h2 className="text-2xl font-black text-slate-900 text-center mb-6 leading-tight px-4 w-full">
                                 {dailyPlan.exercises[currentExerciseIndex].name}
                             </h2>
+
+                            {guidedTabataEnabled && (
+                                <div className={`w-full rounded-3xl p-5 mb-6 border ${guidedIntervalState === 'work' ? 'bg-orange-50 border-orange-200' : 'bg-sky-50 border-sky-200'}`}>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className={`text-xs font-black uppercase tracking-widest ${guidedIntervalState === 'work' ? 'text-orange-600' : 'text-sky-600'}`}>
+                                            {guidedIntervalState === 'work' ? 'Work' : 'Rest'}
+                                        </span>
+                                        <span className="text-xs font-bold text-slate-500">
+                                            Round {guidedCurrentRound}/{GUIDED_TABATA.rounds}
+                                        </span>
+                                    </div>
+                                    <div className="text-center">
+                                        <p className={`text-5xl font-black tracking-tight ${guidedIntervalState === 'work' ? 'text-orange-600' : 'text-sky-600'}`}>
+                                            {Math.max((guidedIntervalState === 'work' ? GUIDED_TABATA.workSecs : GUIDED_TABATA.restSecs) - guidedIntervalElapsed, 0)}
+                                        </p>
+                                        <p className="text-[11px] text-slate-500 font-semibold mt-1">
+                                            Auto-advances to next exercise after {GUIDED_TABATA.rounds} rounds
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* GIF Display Container */}
                             <div className="w-full max-w-[280px] aspect-square bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/50 border-4 border-white overflow-hidden relative mb-8 flex items-center justify-center isolate">
