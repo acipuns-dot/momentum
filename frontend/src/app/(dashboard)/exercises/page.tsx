@@ -131,7 +131,7 @@ export default function ExercisesPage() {
             <div className="px-6 pt-5 space-y-5">
                 {/* ── Target chips ────────────────────────────────────────── */}
                 {!search && (
-                    <div ref={chipRowRef} className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+                <div ref={chipRowRef} className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
                         {TARGETS.map(t => (
                             <button
                                 key={t.value}
@@ -139,7 +139,7 @@ export default function ExercisesPage() {
                                 onClick={e => handleTargetClick(t, e.currentTarget)}
                                 className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${selected.value === t.value
                                     ? 'accent-gradient text-white ui-elevated'
-                                    : 'ui-glass border border-slate-200 text-slate-600'}`}
+                                    : 'ui-glass border border-slate-200 text-slate-600 hover:border-slate-300'}`}
                             >
                                 <span>{t.emoji}</span> {t.label}
                             </button>
@@ -178,7 +178,7 @@ export default function ExercisesPage() {
                             <button
                                 key={ex.id}
                                 onClick={() => setDetail(ex)}
-                                className="ui-glass surface-blue rounded-2xl border border-slate-100 ui-card overflow-hidden text-left active:scale-[0.97] transition-all hover:border-primary-200"
+                            className="ui-glass surface-blue rounded-2xl border border-slate-100 ui-card overflow-hidden text-left active:scale-[0.97] transition-all hover:border-primary-200 hover:-translate-y-0.5"
                             >
                                 {/* GIF or Placeholder */}
                                 <div className="w-full aspect-square bg-slate-100 relative overflow-hidden">

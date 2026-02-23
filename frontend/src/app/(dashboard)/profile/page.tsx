@@ -242,7 +242,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Achievement Badge */}
-            <div className="mx-6 mb-6 ui-accent-soft rounded-[2rem] p-5 border border-orange-100 flex items-center gap-4">
+            <div className="mx-6 mb-6 ui-glass surface-orange rounded-[2rem] p-5 border border-orange-100 flex items-center gap-4 ui-card">
                 <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center ui-card border border-orange-100 flex-shrink-0">
                     <Trophy size={22} className="text-[#f97316]" />
                 </div>
@@ -401,7 +401,7 @@ export default function ProfilePage() {
                                 <button
                                     onClick={handleSaveProfile}
                                     disabled={editLoading}
-                                    className="w-full py-3.5 bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 text-white text-sm font-black rounded-2xl transition-all active:scale-95 ui-elevated  flex items-center justify-center gap-2"
+                                className="w-full py-3.5 accent-gradient disabled:opacity-50 text-white text-sm font-black rounded-2xl transition-all active:scale-95 ui-elevated flex items-center justify-center gap-2"
                                 >
                                     {editLoading ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : 'Save Changes'}
                                 </button>

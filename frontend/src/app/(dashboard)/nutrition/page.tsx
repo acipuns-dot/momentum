@@ -304,7 +304,7 @@ export default function NutritionPage() {
 
             {isModalOpen && (
                 <div className="fixed inset-0 bg-slate-900/40 z-[60] flex items-end sm:items-center justify-center backdrop-blur-sm px-3 sm:px-4">
-                    <div className="ui-glass-strong rounded-t-3xl sm:rounded-[2rem] w-full max-w-md p-6 pb-[calc(2.5rem+env(safe-area-inset-bottom))] ui-elevated border border-slate-100">
+                    <div className="ui-glass-strong surface-violet rounded-t-3xl sm:rounded-[2rem] w-full max-w-md p-6 pb-[calc(2.5rem+env(safe-area-inset-bottom))] ui-elevated border border-slate-100">
                         <div className="flex justify-between items-center mb-5">
                             <h3 className="font-extrabold text-lg text-slate-900">Add to {activeCategory}</h3>
                             <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500">×</button>
@@ -315,7 +315,7 @@ export default function NutritionPage() {
                                 <button
                                     key={cat}
                                     onClick={() => setActiveCategory(cat)}
-                                    className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold transition-all ${activeCategory === cat ? 'bg-primary-500 text-white ui-card' : 'bg-slate-100 text-slate-500'}`}
+                                    className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold transition-all ${activeCategory === cat ? 'accent-gradient text-white ui-card' : 'bg-slate-100 text-slate-500'}`}
                                 >
                                     {cat}
                                 </button>
@@ -357,7 +357,7 @@ export default function NutritionPage() {
                                     <input type="number" placeholder="Carbs (g)" value={form.carbs} onChange={(e) => setForm((f) => ({ ...f, carbs: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-900" />
                                     <input type="number" placeholder="Fat (g)" value={form.fat} onChange={(e) => setForm((f) => ({ ...f, fat: e.target.value }))} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-900" />
                                 </div>
-                                <button onClick={addCustom} disabled={!form.name || !form.kcal} className="w-full mt-2 bg-primary-600 hover:bg-primary-500 disabled:bg-slate-200 disabled:text-slate-400 text-white font-extrabold py-4 rounded-xl">
+                                <button onClick={addCustom} disabled={!form.name || !form.kcal} className="w-full mt-2 accent-gradient disabled:bg-slate-200 disabled:text-slate-400 text-white font-extrabold py-4 rounded-xl ui-elevated">
                                     Save Meal
                                 </button>
                             </div>

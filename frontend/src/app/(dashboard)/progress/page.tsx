@@ -89,7 +89,7 @@ export default function ProgressPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]">
+            <div className="min-h-screen momentum-bg dot-grid-subtle flex items-center justify-center">
                 <Loader2 className="animate-spin text-[#f97316]" size={32} />
             </div>
         );
@@ -129,7 +129,7 @@ export default function ProgressPage() {
                 </div>
                 <button
                     onClick={() => setIsLogModalOpen(true)}
-                    className="w-12 h-12 bg-white rounded-full flex items-center justify-center ui-card border border-slate-100 text-slate-700 hover:text-[#f97316] hover:border-orange-200 transition-colors"
+                    className="w-12 h-12 ui-glass rounded-full flex items-center justify-center ui-card border border-slate-100 text-slate-700 hover:text-[#f97316] hover:border-orange-200 transition-colors"
                 >
                     <Plus size={24} />
                 </button>
@@ -330,7 +330,7 @@ export default function ProgressPage() {
                             <button
                                 onClick={handleLogWeight}
                                 disabled={!newWeight || isNaN(parseFloat(newWeight)) || loggingState}
-                                className="py-3 rounded-xl font-bold text-white bg-[#f97316] hover:bg-orange-600 disabled:opacity-50 transition-colors flex items-center justify-center ui-elevated "
+                                className="py-3 rounded-xl font-bold text-white accent-gradient disabled:opacity-50 transition-colors flex items-center justify-center ui-elevated"
                             >
                                 {loggingState ? <Loader2 size={18} className="animate-spin" /> : "Save"}
                             </button>

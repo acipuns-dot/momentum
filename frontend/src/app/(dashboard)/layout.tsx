@@ -25,7 +25,7 @@ export default function DashboardLayout({
     };
 
     return (
-        <div className="relative min-h-screen pb-[calc(7rem+env(safe-area-inset-bottom))] momentum-bg dot-grid-subtle ui-page overflow-hidden">
+        <div className="momentum-dark relative min-h-screen pb-[calc(7rem+env(safe-area-inset-bottom))] momentum-bg dot-grid-subtle ui-page overflow-hidden">
             {children}
 
             {/* ── FAB Choice Bottom Sheet ───────────────────────────────── */}
@@ -35,14 +35,14 @@ export default function DashboardLayout({
                     onClick={() => setFabOpen(false)}
                 >
                     {/* Backdrop */}
-                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200" />
+                    <div className="absolute inset-0 bg-black/55 backdrop-blur-sm animate-in fade-in duration-200" />
 
                     {/* Sheet */}
                     <div
                         className="relative ui-glass-strong rounded-t-[2.5rem] px-6 pt-5 pb-36 ui-elevated border border-slate-100 animate-in slide-in-from-bottom-4 duration-300"
                         onClick={e => e.stopPropagation()}
                     >
-                        <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-6" />
+                        <div className="w-10 h-1 bg-slate-600/60 rounded-full mx-auto mb-6" />
                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">What would you like to log?</p>
 
                         <div className="grid grid-cols-2 gap-3">
@@ -78,7 +78,7 @@ export default function DashboardLayout({
                         {/* Cancel */}
                         <button
                             onClick={() => setFabOpen(false)}
-                            className="w-full mt-4 py-3.5 rounded-2xl bg-slate-100 text-slate-500 text-sm font-bold flex items-center justify-center gap-2 active:scale-95 transition-all"
+                            className="w-full mt-4 py-3.5 rounded-2xl bg-slate-800 text-slate-300 text-sm font-bold flex items-center justify-center gap-2 active:scale-95 transition-all"
                         >
                             <X size={16} /> Cancel
                         </button>
@@ -90,12 +90,12 @@ export default function DashboardLayout({
             <nav className="fixed bottom-3 left-3 right-3 z-50 rounded-[2rem] ui-pill-nav surface-violet h-[calc(80px+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)]">
                 <div className="flex justify-between items-center h-[80px] px-8 max-w-md mx-auto relative">
 
-                    <Link href="/" className={`flex flex-col items-center justify-center w-[50px] h-full transition-colors group ${isActive('/') ? 'text-[#f97316]' : 'text-slate-400 hover:text-slate-600'}`}>
+                    <Link href="/" className={`flex flex-col items-center justify-center w-[50px] h-full transition-colors group ${isActive('/') ? 'text-[#fb923c]' : 'text-slate-400 hover:text-slate-200'}`}>
                         <Home size={24} className={`mb-1 ${isActive('/') ? 'fill-current' : 'group-hover:scale-110 transition-transform'}`} strokeWidth={isActive('/') ? 2.5 : 2} />
                         <span className="text-xs font-bold">Home</span>
                     </Link>
 
-                    <Link href="/progress" className={`flex flex-col items-center justify-center w-[50px] h-full transition-colors group ${isActive('/progress') ? 'text-[#f97316]' : 'text-slate-400 hover:text-slate-600'}`}>
+                    <Link href="/progress" className={`flex flex-col items-center justify-center w-[50px] h-full transition-colors group ${isActive('/progress') ? 'text-[#fb923c]' : 'text-slate-400 hover:text-slate-200'}`}>
                         <LineChart size={24} className={`mb-1 ${isActive('/progress') ? '' : 'group-hover:scale-110 transition-transform'}`} strokeWidth={isActive('/progress') ? 2.5 : 2} />
                         <span className="text-xs font-bold">Progress</span>
                     </Link>
@@ -105,17 +105,17 @@ export default function DashboardLayout({
                         onClick={() => setFabOpen(true)}
                         className="flex flex-col items-center justify-center w-[64px] h-full relative -top-8 group"
                     >
-                        <div className={`text-white w-[60px] h-[60px] rounded-full flex items-center justify-center ui-elevated transition-all duration-300 ring-4 ring-[#f8f9fa] ${fabOpen ? 'bg-slate-700 rotate-45' : 'bg-[#f97316] group-hover:scale-105'}`}>
+                        <div className={`text-white w-[60px] h-[60px] rounded-full flex items-center justify-center ui-elevated transition-all duration-300 ring-4 ring-[#f8f9fa] ${fabOpen ? 'bg-slate-600 rotate-45' : 'accent-gradient group-hover:scale-105'}`}>
                             <Plus size={32} strokeWidth={2.5} />
                         </div>
                     </button>
 
-                    <Link href="/exercises" className={`flex flex-col items-center justify-center w-[50px] h-full transition-colors group ${isActive('/exercises') ? 'text-[#f97316]' : 'text-slate-400 hover:text-slate-600'}`}>
+                    <Link href="/exercises" className={`flex flex-col items-center justify-center w-[50px] h-full transition-colors group ${isActive('/exercises') ? 'text-[#fb923c]' : 'text-slate-400 hover:text-slate-200'}`}>
                         <Dumbbell size={24} className={`mb-1 ${isActive('/exercises') ? '' : 'group-hover:scale-110 transition-transform'}`} strokeWidth={isActive('/exercises') ? 2.5 : 2} />
                         <span className="text-xs font-bold">Workouts</span>
                     </Link>
 
-                    <Link href="/profile" className={`flex flex-col items-center justify-center w-[50px] h-full transition-colors group ${isActive('/profile') ? 'text-[#f97316]' : 'text-slate-400 hover:text-slate-600'}`}>
+                    <Link href="/profile" className={`flex flex-col items-center justify-center w-[50px] h-full transition-colors group ${isActive('/profile') ? 'text-[#fb923c]' : 'text-slate-400 hover:text-slate-200'}`}>
                         <User size={24} className={`mb-1 ${isActive('/profile') ? '' : 'group-hover:scale-110 transition-transform'}`} strokeWidth={isActive('/profile') ? 2.5 : 2} />
                         <span className="text-xs font-bold">Profile</span>
                     </Link>

@@ -26,10 +26,10 @@ export default function PremiumPaywallModal({
                 onClick={onClose}
             />
 
-            <div className="relative w-full max-w-md ui-glass-strong rounded-t-[2rem] sm:rounded-[2rem] p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] ui-elevated border border-slate-100 animate-in zoom-in-95 duration-200">
+            <div className="relative w-full max-w-md ui-glass-strong surface-violet rounded-t-[2rem] sm:rounded-[2rem] p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] ui-elevated border border-slate-100 animate-in zoom-in-95 duration-200">
                 <button
                     onClick={onClose}
-                    className="absolute right-4 top-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"
+                    className="absolute right-4 top-4 w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center"
                     aria-label="Close premium modal"
                 >
                     <X size={16} />
@@ -61,7 +61,7 @@ export default function PremiumPaywallModal({
                     href={whatsappUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full inline-flex items-center justify-center py-3.5 rounded-2xl bg-[#25D366] text-white text-sm font-black ui-elevated"
+                    className="w-full inline-flex items-center justify-center py-3.5 rounded-2xl accent-gradient text-white text-sm font-black ui-elevated"
                 >
                     Contact on WhatsApp
                 </a>
