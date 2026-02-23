@@ -49,7 +49,7 @@ export default function DashboardLayout({
                             {/* Log Workout */}
                             <button
                                 onClick={() => handleChoice('/log')}
-                                className="flex flex-col items-center justify-center gap-3 bg-orange-50 border border-orange-100 rounded-[1.5rem] p-5 active:scale-95 transition-all hover:border-orange-200 hover:bg-orange-100"
+                                className="flex flex-col items-center justify-center gap-3 bg-orange-50 border border-orange-300/40 rounded-[1.5rem] p-5 active:scale-95 transition-all hover:border-orange-300/60 hover:bg-orange-100"
                             >
                                 <div className="w-14 h-14 bg-[#f97316] rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/30">
                                     <Dumbbell size={26} className="text-white" strokeWidth={2} />
@@ -63,7 +63,7 @@ export default function DashboardLayout({
                             {/* Log Nutrition */}
                             <button
                                 onClick={() => handleChoice('/nutrition')}
-                                className="flex flex-col items-center justify-center gap-3 bg-emerald-50 border border-emerald-100 rounded-[1.5rem] p-5 active:scale-95 transition-all hover:border-emerald-200 hover:bg-emerald-100"
+                                className="flex flex-col items-center justify-center gap-3 bg-emerald-50 border border-emerald-300/40 rounded-[1.5rem] p-5 active:scale-95 transition-all hover:border-emerald-300/60 hover:bg-emerald-100"
                             >
                                 <div className="w-14 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
                                     <Utensils size={26} className="text-white" strokeWidth={2} />

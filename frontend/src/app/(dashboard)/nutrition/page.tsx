@@ -29,11 +29,11 @@ const PRESETS: Omit<Meal, 'id'>[] = [
     { name: 'Banana', category: 'Snack', kcal: 90, protein: 1, carbs: 23, fat: 0 },
 ];
 
-const CATEGORY_META: Record<Category, { emoji: string; color: string; bg: string }> = {
-    Breakfast: { emoji: 'Sunrise', color: 'text-amber-500', bg: 'bg-amber-50' },
-    Lunch: { emoji: 'Day', color: 'text-orange-500', bg: 'bg-orange-50' },
-    Dinner: { emoji: 'Night', color: 'text-indigo-500', bg: 'bg-indigo-50' },
-    Snack: { emoji: 'Snack', color: 'text-emerald-500', bg: 'bg-emerald-50' },
+const CATEGORY_META: Record<Category, { icon: string; color: string; bg: string }> = {
+    Breakfast: { icon: '🍳', color: 'text-amber-400', bg: 'bg-amber-50' },
+    Lunch: { icon: '🥗', color: 'text-orange-400', bg: 'bg-orange-50' },
+    Dinner: { icon: '🍽️', color: 'text-indigo-400', bg: 'bg-indigo-50' },
+    Snack: { icon: '🍎', color: 'text-emerald-400', bg: 'bg-emerald-50' },
 };
 
 const ORDERED_CATEGORIES: Category[] = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
@@ -251,7 +251,7 @@ export default function NutritionPage() {
             <div className="px-6 pt-6 space-y-6">
                 {ORDERED_CATEGORIES.map((cat) => {
                     const catMeals = mealsByCategory(cat);
-                    const { color, bg } = CATEGORY_META[cat];
+                    const { color, bg, icon } = CATEGORY_META[cat];
                     const catSurface =
                         cat === 'Breakfast' ? 'surface-orange' :
                             cat === 'Lunch' ? 'surface-emerald' :
@@ -262,7 +262,7 @@ export default function NutritionPage() {
                         <div key={cat}>
                             <div className="flex justify-between items-center mb-3">
                                 <div className="flex items-center gap-2">
-                                    <div className={`w-8 h-8 ${bg} rounded-xl flex items-center justify-center text-xs font-bold text-slate-500`}>{cat}</div>
+                                    <div className={`w-8 h-8 ${bg} rounded-full flex items-center justify-center text-sm ${color}`}>{icon}</div>
                                     <span className="font-extrabold text-slate-900">{cat}</span>
                                     {catKcal > 0 && (
                                         <span className="text-xs font-semibold text-slate-400 flex items-center gap-1">

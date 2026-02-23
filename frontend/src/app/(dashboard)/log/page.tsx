@@ -22,14 +22,14 @@ type LogEntry = {
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const ACTIVITIES: ActivityType[] = [
-    { id: 'walk', label: 'Walking', icon: <PersonStanding size={26} />, color: 'text-teal-600', bg: 'bg-teal-50', intensity: 'Low', kcalPerMin: 4 },
-    { id: 'run', label: 'Running', icon: <Zap size={26} />, color: 'text-red-500', bg: 'bg-red-50', intensity: 'High', kcalPerMin: 10 },
-    { id: 'cycle', label: 'Cycling', icon: <Bike size={26} />, color: 'text-blue-500', bg: 'bg-blue-50', intensity: 'Cardio', kcalPerMin: 7 },
-    { id: 'hiit', label: 'HIIT', icon: <Flame size={26} />, color: 'text-orange-500', bg: 'bg-orange-50', intensity: 'Intense', kcalPerMin: 12 },
-    { id: 'jump', label: 'Jump Rope', icon: <Wind size={26} />, color: 'text-primary-600', bg: 'bg-primary-50', intensity: 'High', kcalPerMin: 11 },
-    { id: 'strength', label: 'Strength', icon: <Dumbbell size={26} />, color: 'text-purple-500', bg: 'bg-purple-50', intensity: 'Build', kcalPerMin: 6 },
-    { id: 'yoga', label: 'Yoga', icon: <Timer size={26} />, color: 'text-indigo-500', bg: 'bg-indigo-50', intensity: 'Low', kcalPerMin: 3 },
-    { id: 'other', label: 'Other', icon: <Activity size={26} />, color: 'text-slate-500', bg: 'bg-slate-100', intensity: 'Mixed', kcalPerMin: 5 },
+    { id: 'walk', label: 'Walking', icon: <PersonStanding size={26} />, color: 'text-teal-300', bg: 'ui-glass surface-emerald', intensity: 'Low', kcalPerMin: 4 },
+    { id: 'run', label: 'Running', icon: <Zap size={26} />, color: 'text-rose-300', bg: 'ui-glass surface-rose', intensity: 'High', kcalPerMin: 10 },
+    { id: 'cycle', label: 'Cycling', icon: <Bike size={26} />, color: 'text-sky-300', bg: 'ui-glass surface-blue', intensity: 'Cardio', kcalPerMin: 7 },
+    { id: 'hiit', label: 'HIIT', icon: <Flame size={26} />, color: 'text-orange-300', bg: 'ui-glass surface-orange', intensity: 'Intense', kcalPerMin: 12 },
+    { id: 'jump', label: 'Jump Rope', icon: <Wind size={26} />, color: 'text-emerald-300', bg: 'ui-glass surface-emerald', intensity: 'High', kcalPerMin: 11 },
+    { id: 'strength', label: 'Strength', icon: <Dumbbell size={26} />, color: 'text-violet-300', bg: 'ui-glass surface-violet', intensity: 'Build', kcalPerMin: 6 },
+    { id: 'yoga', label: 'Yoga', icon: <Timer size={26} />, color: 'text-indigo-300', bg: 'ui-glass surface-blue', intensity: 'Low', kcalPerMin: 3 },
+    { id: 'other', label: 'Other', icon: <Activity size={26} />, color: 'text-slate-300', bg: 'ui-glass', intensity: 'Mixed', kcalPerMin: 5 },
 ];
 
 const ACTIVITY_EMOJIS: Record<string, string> = {
@@ -825,7 +825,7 @@ export default function WorkoutLoggerPage() {
                                     <button key={act.id} onClick={() => startActivity(act)}
                                         className={`flex flex-col items-center gap-2 p-3 rounded-2xl ${act.bg} border border-transparent hover:border-slate-200 active:scale-95 transition-all`}>
                                         <span className={act.color}>{act.icon}</span>
-                                        <span className="text-xs font-bold text-slate-700 leading-tight text-center">{act.label}</span>
+                                        <span className="text-xs font-bold text-slate-900 leading-tight text-center">{act.label}</span>
                                         <span className="text-xs font-semibold text-slate-400">{act.intensity}</span>
                                     </button>
                                 ))}
@@ -1177,13 +1177,14 @@ export default function WorkoutLoggerPage() {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-2xl p-4 ui-card border border-slate-100">
-                            <div className="grid grid-cols-3 gap-2 mb-3">
+                        <div className="ui-glass surface-violet rounded-2xl p-4 ui-card border border-slate-100">
+                            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-slate-400 mb-3 px-1">Guided Settings</p>
+                            <div className="grid grid-cols-3 gap-2 mb-4 p-1 rounded-2xl bg-slate-900/35 border border-slate-700/40">
                                 {(Object.keys(GUIDED_MODIFIERS) as GuidedModifierKey[]).map((key) => (
                                     <button
                                         key={key}
                                         onClick={() => setGuidedModifier(key)}
-                                        className={`py-2 rounded-xl text-xs font-black border transition-colors ${guidedModifier === key ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'}`}
+                                        className={`py-2 rounded-xl text-xs font-black border transition-colors ${guidedModifier === key ? 'bg-[#f97316]/18 text-orange-300 border-orange-300/40 ui-elevated' : 'bg-slate-800/70 text-slate-400 border-slate-700/40 hover:bg-slate-700/70'}`}
                                     >
                                         {GUIDED_MODIFIERS[key].label}
                                     </button>
@@ -1191,7 +1192,7 @@ export default function WorkoutLoggerPage() {
                             </div>
                             <button
                                 onClick={() => setGuidedTabataEnabled(v => !v)}
-                                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-colors ${guidedTabataEnabled ? 'bg-orange-50 border-orange-200 text-orange-700' : 'bg-slate-50 border-slate-200 text-slate-600'}`}
+                                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-colors ${guidedTabataEnabled ? 'bg-orange-500/12 border-orange-300/45 text-orange-300' : 'bg-slate-800/70 border-slate-700/40 text-slate-400'}`}
                             >
                                 <span className="text-sm font-black">Tabata Style</span>
                                 <span className="text-xs font-bold">
@@ -1206,7 +1207,7 @@ export default function WorkoutLoggerPage() {
                                         return next;
                                     });
                                 }}
-                                className={`w-full mt-2 flex items-center justify-between px-4 py-3 rounded-xl border transition-colors ${guidedVoiceCoachOn ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-50 border-slate-200 text-slate-600'}`}
+                                className={`w-full mt-2 flex items-center justify-between px-4 py-3 rounded-xl border transition-colors ${guidedVoiceCoachOn ? 'bg-emerald-500/12 border-emerald-300/45 text-emerald-300' : 'bg-slate-800/70 border-slate-700/40 text-slate-400'}`}
                             >
                                 <span className="text-sm font-black">Voice Coach</span>
                                 <span className="text-xs font-bold">{guidedVoiceCoachOn ? 'ON' : 'OFF'}</span>
@@ -1217,7 +1218,7 @@ export default function WorkoutLoggerPage() {
                         </div>
 
                         <button onClick={startGuidedRoutine}
-                            className="w-full py-4 bg-[#f97316] hover:bg-orange-600 text-white font-extrabold rounded-2xl flex items-center justify-center gap-2 transition-colors ui-elevated  text-lg active:scale-95">
+                            className="w-full py-4 accent-gradient text-white font-extrabold rounded-2xl flex items-center justify-center gap-2 transition-colors ui-elevated text-lg active:scale-95">
                             <Play size={20} fill="currentColor" /> Let&apos;s Go
                         </button>
                     </div>
@@ -1237,7 +1238,7 @@ export default function WorkoutLoggerPage() {
                         </div>
 
                         <div className="flex-1 flex flex-col items-center overflow-y-auto pb-4">
-                            <span className="text-xs font-bold text-orange-500 bg-orange-50 px-3 py-1 rounded-full uppercase tracking-widest mb-4">
+                            <span className="text-xs font-bold text-orange-300 bg-orange-500/12 border border-orange-300/40 px-3 py-1 rounded-full uppercase tracking-widest mb-4">
                                 {currentExerciseIndex + 1} of {dailyPlan.exercises.length}
                             </span>
 
@@ -1246,40 +1247,40 @@ export default function WorkoutLoggerPage() {
                             </h2>
 
                             {guidedTabataEnabled && (
-                                <div className={`w-full rounded-3xl p-4 mb-4 border ${guidedIntervalState === 'work' ? 'bg-orange-50 border-orange-200' : 'bg-sky-50 border-sky-200'}`}>
+                                <div className={`w-full rounded-3xl p-4 mb-4 border ui-glass ${guidedIntervalState === 'work' ? 'surface-orange border-orange-300/40' : 'surface-blue border-sky-300/40'}`}>
                                     <div className="flex items-center justify-center gap-2 mb-3">
                                         {(['auto', 'reps', 'timed'] as GuidedExerciseMode[]).map((mode) => (
                                             <button
                                                 key={mode}
                                                 onClick={() => setGuidedExerciseModeByIndex(prev => ({ ...prev, [currentExerciseIndex]: mode }))}
-                                                className={`px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider border ${currentOverrideMode === mode ? 'bg-slate-900 text-white border-slate-900' : 'bg-white/70 text-slate-600 border-slate-200'}`}
+                                                className={`px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider border ${currentOverrideMode === mode ? 'bg-[#0f172a] text-white border-slate-700/80' : 'bg-slate-800/75 text-slate-300 border-slate-700/50 hover:bg-slate-700/75'}`}
                                             >
                                                 {mode}
                                             </button>
                                         ))}
                                     </div>
                                     <div className="flex items-center justify-between mb-2">
-                                        <span className={`text-xs font-black uppercase tracking-widest ${guidedIntervalState === 'work' ? 'text-orange-600' : 'text-sky-600'}`}>
+                                        <span className={`text-xs font-black uppercase tracking-widest ${guidedIntervalState === 'work' ? 'text-orange-300' : 'text-sky-300'}`}>
                                             {guidedIntervalState === 'work' ? (currentEffectiveMode === 'reps' ? 'Set' : 'Work') : 'Rest'}
                                         </span>
-                                        <span className="text-xs font-bold text-slate-500">
+                                        <span className="text-xs font-bold text-slate-400">
                                             {currentEffectiveMode === 'reps' ? 'Set' : 'Round'} {guidedCurrentRound}/{guidedTargetRounds}
                                         </span>
                                     </div>
                                     {guidedStartCountdown > 0 ? (
                                         <div className="text-center">
-                                            <p className="text-[12px] text-slate-500 font-semibold uppercase tracking-wider">Starting In</p>
-                                            <p className="text-5xl font-black tracking-tight text-orange-600">{guidedStartCountdown}</p>
-                                            <p className="text-[12px] text-slate-600 font-semibold mt-1">
+                                            <p className="text-[12px] text-slate-400 font-semibold uppercase tracking-wider">Starting In</p>
+                                            <p className="text-5xl font-black tracking-tight text-orange-300">{guidedStartCountdown}</p>
+                                            <p className="text-[12px] text-slate-300 font-semibold mt-1">
                                                 Get ready. Timer starts with voice countdown.
                                             </p>
                                         </div>
                                     ) : (
                                         <div className="text-center">
-                                            <p className={`text-5xl font-black tracking-tight ${guidedIntervalState === 'work' ? 'text-orange-600' : 'text-sky-600'}`}>
+                                            <p className={`text-5xl font-black tracking-tight ${guidedIntervalState === 'work' ? 'text-orange-300' : 'text-sky-300'}`}>
                                                 {Math.max((guidedIntervalState === 'work' ? guidedWorkSecs : guidedRestSecs) - guidedIntervalElapsed, 0)}
                                             </p>
-                                            <p className="text-[12px] text-slate-600 font-semibold mt-1">
+                                            <p className="text-[12px] text-slate-300 font-semibold mt-1">
                                                 {currentEffectiveMode === 'reps'
                                                     ? `Target: ${currentGuidedExercise?.durationOrReps || 'reps'} · Auto progression`
                                                     : `Auto-advances to next exercise after ${guidedTargetRounds} rounds`}
@@ -1290,7 +1291,7 @@ export default function WorkoutLoggerPage() {
                             )}
 
                             {/* GIF Display Container */}
-                            <div className="w-full max-w-[240px] sm:max-w-[280px] aspect-square bg-white rounded-[2.2rem] ui-elevated  border-4 border-white overflow-hidden relative mb-5 flex items-center justify-center isolate">
+                            <div className="w-full max-w-[240px] sm:max-w-[280px] aspect-square ui-glass surface-blue rounded-[2.2rem] ui-elevated border border-slate-200 overflow-hidden relative mb-5 flex items-center justify-center isolate">
                                 {dailyPlan.exercises[currentExerciseIndex].isLoadingGif ? (
                                     <div className="flex flex-col items-center gap-3 text-slate-400 animate-pulse">
                                         <Dumbbell size={32} className="opacity-50" />
@@ -1300,7 +1301,7 @@ export default function WorkoutLoggerPage() {
                                     <img
                                         src={dailyPlan.exercises[currentExerciseIndex].gifUrl}
                                         alt={dailyPlan.exercises[currentExerciseIndex].name}
-                                        className="w-full h-full object-cover mix-blend-multiply"
+                                        className="w-full h-full object-cover"
                                     />
                                 ) : (
                                     <div className="flex flex-col items-center gap-3 text-slate-300">
@@ -1311,7 +1312,7 @@ export default function WorkoutLoggerPage() {
                             </div>
 
                             {/* Sets & Reps Card */}
-                            <div className="w-full bg-white rounded-3xl p-4 ui-card border border-slate-100 flex flex-col items-center justify-center mb-4 relative overflow-hidden">
+                            <div className="w-full ui-glass surface-blue rounded-3xl p-4 ui-card border border-slate-100 flex flex-col items-center justify-center mb-4 relative overflow-hidden">
                                 <div className="absolute top-0 right-0 p-4 opacity-5 text-8xl font-black -translate-y-4 translate-x-4">
                                     {dailyPlan.exercises[currentExerciseIndex].sets || 1}
                                 </div>
@@ -1320,7 +1321,7 @@ export default function WorkoutLoggerPage() {
                                     {dailyPlan.exercises[currentExerciseIndex].durationOrReps}
                                 </span>
                                 {dailyPlan.exercises[currentExerciseIndex].sets && (
-                                    <span className="text-[12px] font-bold text-slate-600 mt-2 z-10 bg-slate-50 px-3 py-1 rounded-full border border-slate-100">
+                                    <span className="text-[12px] font-bold text-slate-300 mt-2 z-10 bg-slate-800/70 px-3 py-1 rounded-full border border-slate-700/50">
                                         {dailyPlan.exercises[currentExerciseIndex].sets} Sets
                                     </span>
                                 )}
@@ -1330,7 +1331,7 @@ export default function WorkoutLoggerPage() {
                             {dailyPlan.exercises[currentExerciseIndex].instructions && dailyPlan.exercises[currentExerciseIndex].instructions!.length > 0 && (
                                 <div className="w-full mb-5 px-1">
                                     <h3 className="text-[12px] font-bold text-slate-400 uppercase tracking-widest mb-2 text-center">How to perform</h3>
-                                    <ol className="text-[13px] text-slate-600 space-y-2 list-decimal list-outside pl-4 text-left font-medium">
+                                    <ol className="text-[13px] text-slate-300 space-y-2 list-decimal list-outside pl-4 text-left font-medium">
                                         {dailyPlan.exercises[currentExerciseIndex].instructions!.map((step: string, idx: number) => (
                                             <li key={idx} className="leading-relaxed border-b border-slate-100 pb-2 last:border-0">{step}</li>
                                         ))}
@@ -1341,18 +1342,18 @@ export default function WorkoutLoggerPage() {
                         </div>
 
                         {/* Controls */}
-                        <div className="sticky bottom-[calc(5.25rem+env(safe-area-inset-bottom))] bg-slate-50/95 backdrop-blur-sm border-t border-slate-100 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 flex items-center justify-between w-auto mt-auto gap-3">
+                        <div className="sticky bottom-[calc(5.25rem+env(safe-area-inset-bottom))] bg-slate-950/88 backdrop-blur-sm border-t border-slate-700/40 -mx-4 sm:-mx-6 px-4 sm:px-6 py-3 flex items-center justify-between w-auto mt-auto gap-3">
                             <button
                                 onClick={prevExercise}
                                 disabled={currentExerciseIndex === 0}
-                                className="w-14 h-14 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 disabled:opacity-30 active:scale-95 transition-all ui-card flex-shrink-0"
+                                className="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700/50 flex items-center justify-center text-slate-300 disabled:opacity-30 active:scale-95 transition-all ui-card flex-shrink-0"
                             >
                                 <ChevronLeft size={24} />
                             </button>
 
                             <button
                                 onClick={nextExercise}
-                                className="flex-1 py-3.5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white font-extrabold rounded-2xl flex items-center justify-center gap-2 transition-transform ui-elevated active:scale-95 text-base"
+                                className="flex-1 py-3.5 accent-gradient disabled:bg-slate-600 text-white font-extrabold rounded-2xl flex items-center justify-center gap-2 transition-transform ui-elevated active:scale-95 text-base"
                             >
                                 {currentExerciseIndex === dailyPlan.exercises.length - 1 ? (
                                     <><CheckCircle size={20} /> Finish Workout</>

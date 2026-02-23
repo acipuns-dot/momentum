@@ -257,7 +257,7 @@ export default function ProfilePage() {
             {/* Account Actions */}
             <div className="px-6 mb-6">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Account</p>
-                <div className="ui-glass surface-blue rounded-[2rem] ui-card border border-slate-100 overflow-hidden divide-y divide-slate-50">
+                <div className="ui-glass surface-blue rounded-[2rem] ui-card border border-slate-100 overflow-hidden divide-y divide-slate-700/30">
                     {user?.is_admin && (
                         <button
                             onClick={() => router.push('/admin')}
