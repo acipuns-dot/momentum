@@ -286,7 +286,7 @@ export default function ProfilePage() {
                     </button>
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center justify-between px-5 py-4 hover:bg-red-50 transition-colors group"
+                        className="w-full flex items-center justify-between px-5 py-4 hover:bg-rose-500/12 transition-colors group"
                     >
                         <div className="flex items-center gap-3">
                             <div className="w-9 h-9 rounded-full bg-red-50 group-hover:bg-red-100 flex items-center justify-center transition-colors">
