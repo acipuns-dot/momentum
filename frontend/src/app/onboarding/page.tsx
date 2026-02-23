@@ -86,7 +86,9 @@ export default function OnboardingPage() {
             try {
                 // Fetch fresh user data to be 100% sure of their status
                 const userRecord = await pb.collection('users').getOne(user.id);
-                isPremium = !!userRecord.is_premium;
+                const expiryMs = userRecord?.premium_until ? new Date(userRecord.premium_until).getTime() : 0;
+                const hasActivePremium = !!userRecord.is_premium && expiryMs > Date.now();
+                isPremium = hasActivePremium;
             } catch (e) {
                 console.error("Failed to check premium status, defaulting to Free tier.");
             }

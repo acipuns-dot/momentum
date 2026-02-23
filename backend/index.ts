@@ -84,6 +84,14 @@ const getRequester = async (req: Request) => {
     }
 };
 
+const hasActivePremium = (userRecord: any): boolean => {
+    if (!userRecord?.is_premium) return false;
+    if (!userRecord?.premium_until) return false;
+    const expiryMs = new Date(userRecord.premium_until).getTime();
+    if (Number.isNaN(expiryMs)) return false;
+    return expiryMs > Date.now();
+};
+
 // --- Schemas ---
 const GeneratePlanRequestSchema = z.object({
     userId: z.string().min(1).optional(),
@@ -148,7 +156,15 @@ app.post('/generate-plan', async (req: Request, res: Response): Promise<any> => 
         let isPremium = false;
         try {
             const userRecord = await pb.collection('users').getOne(userId);
-            isPremium = !!userRecord.is_premium;
+            isPremium = hasActivePremium(userRecord);
+
+            // Auto-expire stale premium flags
+            if (!isPremium && userRecord.is_premium) {
+                await pb.collection('users').update(userId, {
+                    is_premium: false,
+                    premium_until: '',
+                });
+            }
         } catch (e) {
             console.warn(`User ${userId} not found in users collection yet. Defaulting to free tier.`);
         }
@@ -281,7 +297,7 @@ app.get('/admin/users', async (req: Request, res: Response): Promise<any> => {
             sort: '-created',
         });
 
-        const premiumCount = users.filter(u => u.is_premium).length;
+        const premiumCount = users.filter(u => hasActivePremium(u)).length;
         const totalUsers = users.length;
         const estimatedMRR = premiumCount * 4.90;
 
@@ -290,7 +306,8 @@ app.get('/admin/users', async (req: Request, res: Response): Promise<any> => {
                 id: u.id,
                 email: u.email,
                 name: u.name || 'No Name',
-                is_premium: !!u.is_premium,
+                is_premium: hasActivePremium(u),
+                is_premium_raw: !!u.is_premium,
                 premium_until: u.premium_until || null,
                 created: u.created
             })),
