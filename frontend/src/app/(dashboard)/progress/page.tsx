@@ -120,7 +120,7 @@ export default function ProgressPage() {
     }).join(' ');
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle text-slate-900 pb-32 font-sans selection:bg-orange-500 selection:text-white max-w-md mx-auto ui-elevated ">
+        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle text-slate-900 pb-32 font-sans selection:bg-orange-500 selection:text-white ui-page">
             {/* Header */}
             <div className="pt-12 px-6 mb-8 flex items-center justify-between">
                 <div>
@@ -144,7 +144,7 @@ export default function ProgressPage() {
                             <Scale size={20} className="text-[#f97316]" />
                             <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Current Weight</h2>
                         </div>
-                        <div className="bg-green-50 text-green-600 font-bold px-3 py-1 rounded-full text-xs flex items-center gap-1 border border-green-100">
+                        <div className="status-success border font-bold px-3 py-1 rounded-full text-xs flex items-center gap-1">
                             <TrendingDown size={14} /> {totalLost > 0 ? `${totalLost.toFixed(1)}kg lost` : 'Just starting'}
                         </div>
                     </div>

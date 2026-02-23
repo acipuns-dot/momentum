@@ -512,7 +512,7 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle text-slate-900 pb-32 font-sans selection:bg-orange-500 selection:text-white max-w-md mx-auto relative ui-elevated ">
+        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle text-slate-900 pb-32 font-sans selection:bg-orange-500 selection:text-white ui-page relative">
 
             <div className="pt-12 px-6 flex justify-between items-start mb-8">
                 <div className="flex items-center gap-4">
@@ -611,7 +611,7 @@ export default function DashboardPage() {
                                     ? 'bg-[#f97316] text-white ui-elevated '
                                     : isFuture
                                         ? 'bg-slate-50 border border-slate-100 text-slate-300 hover:border-orange-200'
-                                        : 'bg-white border border-slate-100 text-slate-400 hover:border-orange-200 hover:shadow-md'
+                                        : 'bg-white border border-slate-100 text-slate-400 hover:border-orange-200'
                                     }`}
                             >
                                 <span className={`text-xs uppercase tracking-wider font-bold mb-1 ${isSelected ? 'text-orange-100' : 'text-slate-400'}`}>
@@ -781,7 +781,7 @@ export default function DashboardPage() {
                                     </>
                                 ) : (
                                     <>
-                                        <span className={`inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full ${isPremiumActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>
+                                        <span className={`inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full border ${isPremiumActive ? 'status-success' : 'status-locked'}`}>
                                             <Crown size={10} />
                                             Pro
                                         </span>
@@ -1025,7 +1025,7 @@ export default function DashboardPage() {
                                     isTodayWorkoutCompleted ? (
                                         <button
                                             disabled
-                                            className="w-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed"
+                                            className="w-full border status-success font-extrabold py-4 rounded-xl flex items-center justify-center gap-2 cursor-not-allowed"
                                         >
                                             <CheckCircle2 size={18} />
                                             <span>Completed Today</span>

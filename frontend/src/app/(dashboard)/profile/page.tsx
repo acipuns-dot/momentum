@@ -169,7 +169,7 @@ export default function ProfilePage() {
         : 7;
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle pb-32 font-sans max-w-md mx-auto">
+        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle pb-32 font-sans ui-page">
 
             {/* Header */}
             <div className="pt-12 px-6 pb-8 flex items-center justify-between">
@@ -382,7 +382,7 @@ export default function ProfilePage() {
                                                 key={opt.key}
                                                 onClick={() => setEditActivity(opt.key)}
                                                 className={`py-2.5 rounded-2xl text-xs font-bold border-2 transition-all ${editActivity === opt.key
-                                                    ? 'bg-[#f97316] border-[#f97316] text-white shadow-md shadow-orange-500/25'
+                                                    ? 'bg-[#f97316] border-[#f97316] text-white ui-elevated'
                                                     : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
                                                     }`}
                                             >

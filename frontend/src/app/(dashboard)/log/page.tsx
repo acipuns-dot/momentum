@@ -711,7 +711,7 @@ export default function WorkoutLoggerPage() {
 
     // ── Render ─────────────────────────────────────────────────────────────────
     return (
-        <div className="min-h-screen bg-slate-50 dot-grid-subtle font-sans pb-[calc(7rem+env(safe-area-inset-bottom))]">
+        <div className="min-h-screen bg-slate-50 dot-grid-subtle font-sans ui-page pb-[calc(7rem+env(safe-area-inset-bottom))]">
 
             {/* Header */}
             <div className="bg-white px-6 pt-12 pb-5 border-b border-slate-100 ui-card sticky top-0 z-10">
@@ -747,13 +747,13 @@ export default function WorkoutLoggerPage() {
                 </div>
                 {phase !== 'guided_active' && phase !== 'guided_intro' && (
                     <div className="flex gap-3 mt-4">
-                        <div className="flex items-center gap-1.5 bg-orange-50 border border-orange-100 rounded-full px-3 py-1.5">
-                            <Flame size={14} className="text-orange-400" />
-                            <span className="text-xs font-bold text-orange-600">{totalKcal} kcal</span>
+                        <div className="flex items-center gap-1.5 status-active border rounded-full px-3 py-1.5">
+                            <Flame size={14} className="text-current" />
+                            <span className="text-xs font-bold">{totalKcal} kcal</span>
                         </div>
-                        <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-100 rounded-full px-3 py-1.5">
-                            <Clock size={14} className="text-blue-400" />
-                            <span className="text-xs font-bold text-blue-600">{totalMins} min</span>
+                        <div className="flex items-center gap-1.5 status-rest border rounded-full px-3 py-1.5">
+                            <Clock size={14} className="text-current" />
+                            <span className="text-xs font-bold">{totalMins} min</span>
                         </div>
                         <div className="flex items-center gap-1.5 bg-primary-50 border border-primary-100 rounded-full px-3 py-1.5">
                             <Activity size={14} className="text-primary-500" />
@@ -777,7 +777,7 @@ export default function WorkoutLoggerPage() {
                                         className={`flex flex-col items-center gap-2 p-3 rounded-2xl ${act.bg} border border-transparent hover:border-slate-200 active:scale-95 transition-all`}>
                                         <span className={act.color}>{act.icon}</span>
                                         <span className="text-xs font-bold text-slate-700 leading-tight text-center">{act.label}</span>
-                                        <span className="text-[9px] font-semibold text-slate-400">{act.intensity}</span>
+                                        <span className="text-xs font-semibold text-slate-400">{act.intensity}</span>
                                     </button>
                                 ))}
                             </div>
