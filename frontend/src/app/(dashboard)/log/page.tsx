@@ -711,7 +711,7 @@ export default function WorkoutLoggerPage() {
 
     // ── Render ─────────────────────────────────────────────────────────────────
     return (
-        <div className="min-h-screen bg-slate-50 font-sans pb-[calc(7rem+env(safe-area-inset-bottom))]">
+        <div className="min-h-screen bg-slate-50 dot-grid-subtle font-sans pb-[calc(7rem+env(safe-area-inset-bottom))]">
 
             {/* Header */}
             <div className="bg-white px-6 pt-12 pb-5 border-b border-slate-100 shadow-sm sticky top-0 z-10">

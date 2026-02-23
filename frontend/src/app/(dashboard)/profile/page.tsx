@@ -169,7 +169,7 @@ export default function ProfilePage() {
         : 7;
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] pb-32 font-sans max-w-md mx-auto">
+        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle pb-32 font-sans max-w-md mx-auto">
 
             {/* Header */}
             <div className="pt-12 px-6 pb-8 flex items-center justify-between">

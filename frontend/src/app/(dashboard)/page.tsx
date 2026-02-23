@@ -512,7 +512,7 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] text-slate-900 pb-32 font-sans selection:bg-orange-500 selection:text-white max-w-md mx-auto relative shadow-2xl shadow-slate-200/50">
+        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle text-slate-900 pb-32 font-sans selection:bg-orange-500 selection:text-white max-w-md mx-auto relative shadow-2xl shadow-slate-200/50">
 
             <div className="pt-12 px-6 flex justify-between items-start mb-8">
                 <div className="flex items-center gap-4">
