@@ -87,7 +87,7 @@ export default function DashboardLayout({
             )}
 
             {/* ── Bottom Navigation ─────────────────────────────────────── */}
-            <nav className="fixed bottom-3 left-3 right-3 z-50 rounded-[2rem] ui-pill-nav h-[calc(80px+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)]">
+            <nav className="fixed bottom-3 left-3 right-3 z-50 rounded-[2rem] ui-pill-nav surface-violet h-[calc(80px+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)]">
                 <div className="flex justify-between items-center h-[80px] px-8 max-w-md mx-auto relative">
 
                     <Link href="/" className={`flex flex-col items-center justify-center w-[50px] h-full transition-colors group ${isActive('/') ? 'text-[#f97316]' : 'text-slate-400 hover:text-slate-600'}`}>

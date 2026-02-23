@@ -634,7 +634,7 @@ export default function DashboardPage() {
             <div className="px-6 space-y-16 mt-6">
 
                 {/* CALORIES SECTION */}
-                <div className="ui-glass-strong rounded-[2rem] py-6 px-6 ui-card mb-6 mx-6">
+                <div className="ui-glass-strong surface-orange rounded-[2rem] py-6 px-6 ui-card mb-6 mx-6">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-lg font-bold text-slate-900">Energy Balance</h2>
                         <span className="text-sm font-bold text-[#f97316]">Today</span>
@@ -688,7 +688,7 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-2 gap-4 px-6 mb-8 mt-[-1rem]">
                     {/* Hydration */}
                     <div onClick={() => isToday && setIsWaterModalOpen(true)}
-                        className={`ui-glass rounded-[2rem] p-5 ui-card flex flex-col justify-between transition-colors h-48 ${isToday ? 'cursor-pointer hover:border-blue-200' : 'cursor-default'}`}>
+                        className={`ui-glass surface-blue rounded-[2rem] p-5 ui-card flex flex-col justify-between transition-colors h-48 ${isToday ? 'cursor-pointer hover:border-blue-200' : 'cursor-default'}`}>
                         <div className="flex items-center gap-2 mb-2">
                             <div className="bg-blue-50 p-1.5 rounded-full">
                                 <Droplet size={16} className="text-blue-500 fill-blue-500" />
@@ -705,7 +705,7 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Weight + BMI */}
-                    <div className="ui-glass rounded-[2rem] p-5 ui-card flex flex-col gap-3 h-48">
+                    <div className="ui-glass surface-violet rounded-[2rem] p-5 ui-card flex flex-col gap-3 h-48">
                         <div className="flex items-center gap-2">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#f97316]">
                                 <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
@@ -758,7 +758,7 @@ export default function DashboardPage() {
                             <button
                                 onClick={handleGeneratePlan}
                                 disabled={generatingPlan || !profile}
-                                className="flex items-center gap-1.5 border text-xs font-black px-3 py-1.5 rounded-full transition-all active:scale-95 disabled:opacity-40 bg-orange-50 hover:bg-orange-100 text-[#f97316] border-orange-200"
+                                className="flex items-center gap-1.5 border text-xs font-black px-3 py-1.5 rounded-full transition-all active:scale-95 disabled:opacity-40 status-active"
                             >
                                 {generatingPlan
                                     ? <Loader2 size={12} className="animate-spin" />
@@ -770,7 +770,7 @@ export default function DashboardPage() {
                                 onClick={handleGeneratePremiumPlan}
                                 disabled={generatingPremiumPlan || !profile}
                                 className={`flex items-center gap-2 border text-xs font-black px-3 py-1.5 rounded-full transition-all active:scale-95 ${isPremiumActive
-                                    ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border-emerald-200'
+                                    ? 'status-success'
                                     : 'bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-200'
                                     } disabled:opacity-40`}
                             >
@@ -811,7 +811,7 @@ export default function DashboardPage() {
                                     {activeDay.nutritionTip && (
                                         <div className="relative animate-in fade-in slide-in-from-bottom-2 duration-500">
                                             <div className="absolute -left-[25px] top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-[#f97316] ring-[6px] ring-[#f8f9fa] z-10"></div>
-                                            <div className="ui-glass rounded-2xl p-4 ui-card ml-4">
+                                            <div className="ui-glass surface-emerald rounded-2xl p-4 ui-card ml-4">
                                                 <div className="flex items-center gap-4 w-full">
                                                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-xl shadow-inner">💡</div>
                                                     <div className="flex-1 min-w-0">
@@ -828,7 +828,7 @@ export default function DashboardPage() {
                                             <div className="absolute -left-[25px] top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-slate-200 ring-[6px] ring-[#f8f9fa] z-10"></div>
                                             <div
                                                 onClick={() => setIsWorkoutBriefOpen(true)}
-                                                className={`ui-glass rounded-2xl p-4 ui-card flex flex-col ml-4 transition-colors group hover:border-[#f97316]/50 cursor-pointer`}
+                                                className={`ui-glass surface-orange rounded-2xl p-4 ui-card flex flex-col ml-4 transition-colors group hover:border-[#f97316]/50 cursor-pointer`}
                                             >
                                                 <div className="flex items-start justify-between mb-3">
                                                     <div className="flex items-center gap-4">
@@ -860,7 +860,7 @@ export default function DashboardPage() {
                                     {activeDay.type === 'rest' && (
                                         <div className="relative animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
                                             <div className="absolute -left-[25px] top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-slate-200 ring-[6px] ring-[#f8f9fa] z-10"></div>
-                                            <div className="ui-glass rounded-2xl p-4 ui-card flex items-center gap-4 ml-4">
+                                            <div className="ui-glass surface-blue rounded-2xl p-4 ui-card flex items-center gap-4 ml-4">
                                                 <div className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-xl shadow-inner">🧘</div>
                                                 <div>
                                                     <h4 className="text-sm font-bold text-slate-900">Active Recovery</h4>

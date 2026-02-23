@@ -208,7 +208,7 @@ export default function NutritionPage() {
 
     return (
         <div className="min-h-screen momentum-bg dot-grid-subtle pb-28 font-sans ui-page">
-            <div className="ui-glass-strong px-6 pt-12 pb-6 border-b border-slate-100 ui-card sticky top-0 z-10">
+            <div className="ui-glass-strong surface-orange px-6 pt-12 pb-6 border-b border-slate-100 ui-card sticky top-0 z-10">
                 <div className="flex justify-between items-start mb-5">
                     <div>
                         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Today</p>
@@ -233,11 +233,11 @@ export default function NutritionPage() {
 
                 <div className="flex gap-3 mt-4">
                     {[
-                        { label: 'Protein', val: loggedProtein, target: targetProtein, color: 'bg-blue-500' },
-                        { label: 'Carbs', val: loggedCarbs, target: targetCarbs, color: 'bg-orange-400' },
-                        { label: 'Fat', val: loggedFat, target: targetFat, color: 'bg-red-400' },
-                    ].map(({ label, val, target, color }) => (
-                        <div key={label} className="flex-1 ui-glass border border-slate-100 rounded-2xl p-2.5 flex flex-col items-center">
+                        { label: 'Protein', val: loggedProtein, target: targetProtein, color: 'bg-blue-500', surface: 'surface-blue' },
+                        { label: 'Carbs', val: loggedCarbs, target: targetCarbs, color: 'bg-orange-400', surface: 'surface-orange' },
+                        { label: 'Fat', val: loggedFat, target: targetFat, color: 'bg-red-400', surface: 'surface-rose' },
+                    ].map(({ label, val, target, color, surface }) => (
+                        <div key={label} className={`flex-1 ui-glass ${surface} border border-slate-100 rounded-2xl p-2.5 flex flex-col items-center`}>
                             <div className="w-full h-1 bg-slate-200 rounded-full mb-2 overflow-hidden">
                                 <div className={`h-full ${color} rounded-full transition-all duration-500`} style={{ width: `${Math.min((val / target) * 100, 100)}%` }} />
                             </div>
@@ -252,6 +252,10 @@ export default function NutritionPage() {
                 {ORDERED_CATEGORIES.map((cat) => {
                     const catMeals = mealsByCategory(cat);
                     const { color, bg } = CATEGORY_META[cat];
+                    const catSurface =
+                        cat === 'Breakfast' ? 'surface-orange' :
+                            cat === 'Lunch' ? 'surface-emerald' :
+                                cat === 'Dinner' ? 'surface-violet' : 'surface-blue';
                     const catKcal = catMeals.reduce((s, m) => s + m.kcal, 0);
 
                     return (
@@ -275,7 +279,7 @@ export default function NutritionPage() {
                             {catMeals.length > 0 ? (
                                 <div className="space-y-2">
                                     {catMeals.map((meal) => (
-                                        <div key={meal.id} className="ui-glass rounded-2xl px-4 py-3 flex items-center justify-between border border-slate-100 ui-card">
+                                        <div key={meal.id} className={`ui-glass ${catSurface} rounded-2xl px-4 py-3 flex items-center justify-between border border-slate-100 ui-card`}>
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-bold text-slate-900 text-sm truncate">{meal.name}</p>
                                                 <p className="text-xs text-slate-400 mt-0.5">
@@ -289,7 +293,7 @@ export default function NutritionPage() {
                                     ))}
                                 </div>
                             ) : (
-                                <button onClick={() => { setActiveCategory(cat); setIsModalOpen(true); }} className="w-full ui-glass border border-dashed border-slate-200 rounded-2xl py-4 text-xs font-semibold text-slate-500">
+                                <button onClick={() => { setActiveCategory(cat); setIsModalOpen(true); }} className={`w-full ui-glass ${catSurface} border border-dashed border-slate-200 rounded-2xl py-4 text-xs font-semibold text-slate-500`}>
                                     <Plus size={13} strokeWidth={3} className="inline mr-1" /> Log {cat}
                                 </button>
                             )}

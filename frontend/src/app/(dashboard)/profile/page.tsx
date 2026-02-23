@@ -187,7 +187,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Avatar Card */}
-            <div className="mx-6 mb-6 ui-glass-strong rounded-[2rem] p-6 ui-card border border-slate-100 flex items-center gap-5">
+            <div className="mx-6 mb-6 ui-glass-strong surface-violet rounded-[2rem] p-6 ui-card border border-slate-100 flex items-center gap-5">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-[#f97316] flex items-center justify-center ui-elevated  flex-shrink-0">
                     <UserIcon size={28} className="text-white" strokeWidth={2.5} />
                 </div>
@@ -232,7 +232,7 @@ export default function ProfilePage() {
                             <div key={i} className="ui-glass rounded-2xl p-4 ui-card border border-slate-100 h-20 animate-pulse" />
                         ))
                         : statCards.map((s, i) => (
-                            <div key={i} className="ui-glass rounded-2xl p-4 ui-card border border-slate-100">
+                            <div key={i} className={`ui-glass rounded-2xl p-4 ui-card border border-slate-100 ${i % 2 === 0 ? 'surface-blue' : 'surface-emerald'}`}>
                                 <div className="flex items-center gap-2 mb-2">{s.icon}<span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{s.label}</span></div>
                                 <p className="text-base font-black text-slate-800 capitalize">{s.value}</p>
                             </div>
@@ -257,7 +257,7 @@ export default function ProfilePage() {
             {/* Account Actions */}
             <div className="px-6 mb-6">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Account</p>
-                <div className="ui-glass rounded-[2rem] ui-card border border-slate-100 overflow-hidden divide-y divide-slate-50">
+                <div className="ui-glass surface-blue rounded-[2rem] ui-card border border-slate-100 overflow-hidden divide-y divide-slate-50">
                     {user?.is_admin && (
                         <button
                             onClick={() => router.push('/admin')}

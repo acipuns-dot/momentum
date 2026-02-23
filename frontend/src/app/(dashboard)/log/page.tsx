@@ -714,7 +714,7 @@ export default function WorkoutLoggerPage() {
         <div className="min-h-screen momentum-bg dot-grid-subtle font-sans ui-page pb-[calc(7rem+env(safe-area-inset-bottom))]">
 
             {/* Header */}
-            <div className="ui-glass-strong px-6 pt-12 pb-5 border-b border-slate-100 ui-card sticky top-0 z-10">
+            <div className="ui-glass-strong surface-orange px-6 pt-12 pb-5 border-b border-slate-100 ui-card sticky top-0 z-10">
                 <div className="flex items-center gap-3 mb-1">
                     {phase === 'jump_setup' || phase === 'guided_intro' ? (
                         <button onClick={resetAll} className="text-slate-400 hover:text-slate-700">
@@ -782,7 +782,7 @@ export default function WorkoutLoggerPage() {
                                 ))}
                             </div>
                             <Link href="/exercises"
-                                className="mt-3 flex items-center justify-between w-full ui-glass border border-slate-200 rounded-2xl px-4 py-3.5 hover:border-primary-300 transition-colors ui-card">
+                                className="mt-3 flex items-center justify-between w-full ui-glass surface-blue border border-slate-200 rounded-2xl px-4 py-3.5 hover:border-primary-300 transition-colors ui-card">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center text-lg">🎯</div>
                                     <div>
@@ -808,7 +808,7 @@ export default function WorkoutLoggerPage() {
                             ) : (
                                 <div className="space-y-3">
                                     {logs.map(log => (
-                                        <div key={log.id} className="ui-glass rounded-2xl px-4 py-3.5 flex items-center justify-between border border-slate-100 ui-card">
+                                        <div key={log.id} className="ui-glass surface-orange rounded-2xl px-4 py-3.5 flex items-center justify-between border border-slate-100 ui-card">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-11 h-11 rounded-xl bg-primary-50 flex items-center justify-center text-xl">{log.icon}</div>
                                                 <div>
@@ -972,7 +972,7 @@ export default function WorkoutLoggerPage() {
                                 </div>
                                 <h2 className="text-xl font-extrabold text-slate-900 mb-1">{selected.label}</h2>
                                 <p className="text-xs font-semibold text-slate-400 mb-10">{selected.intensity} Intensity</p>
-                                <div className="ui-glass rounded-3xl px-12 py-8 ui-card border border-slate-100 text-center mb-8 w-full">
+                                <div className="ui-glass surface-violet rounded-3xl px-12 py-8 ui-card border border-slate-100 text-center mb-8 w-full">
                                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Duration</p>
                                     <span className="text-6xl font-black text-slate-900 tabular-nums tracking-tight">{fmt(elapsed)}</span>
                                     <p className="text-sm font-semibold text-slate-400 mt-3">
@@ -1108,7 +1108,7 @@ export default function WorkoutLoggerPage() {
                             <p className="text-sm text-slate-500 font-medium mt-2">{dailyPlan.exercises.length} movements scheduled</p>
                         </div>
 
-                        <div className="ui-glass-strong rounded-[2rem] p-6 ui-card border border-slate-100">
+                        <div className="ui-glass-strong surface-orange rounded-[2rem] p-6 ui-card border border-slate-100">
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">The Plan</h3>
                             <div className="space-y-4">
                                 {dailyPlan.exercises.map((ex, idx) => (
@@ -1314,7 +1314,7 @@ export default function WorkoutLoggerPage() {
             {showGuidedSummary && (
                 <div className="fixed inset-0 z-[85] flex items-center justify-center px-5">
                     <div className="absolute inset-0 bg-slate-900/45 backdrop-blur-sm" onClick={() => setShowGuidedSummary(false)} />
-                    <div className="relative w-full max-w-md max-h-[80vh] overflow-y-auto ui-glass-strong rounded-[1.5rem] p-5 border border-slate-100 ui-elevated">
+                    <div className="relative w-full max-w-md max-h-[80vh] overflow-y-auto ui-glass-strong surface-violet rounded-[1.5rem] p-5 border border-slate-100 ui-elevated">
                         <h3 className="text-xl font-black text-slate-900">Workout Summary</h3>
                         <p className="text-sm text-slate-500 font-medium mt-1">Review your session before saving.</p>
                         <div className="grid grid-cols-2 gap-3 mt-4">
