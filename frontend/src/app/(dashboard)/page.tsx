@@ -728,8 +728,8 @@ export default function DashboardPage() {
 
                 {/* TODAY'S PROTOCOL */}
                 <div className="px-6 mb-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <div className="flex items-center gap-2 text-slate-900">
+                    <div className="mb-6">
+                        <div className="flex items-center gap-2 text-slate-900 mb-3">
                             <Calendar size={20} className="text-[#f97316]" strokeWidth={2.5} />
                             <h2 className="text-lg font-bold">Daily Protocol</h2>
                         </div>
@@ -743,7 +743,7 @@ export default function DashboardPage() {
                                     ? <Loader2 size={12} className="animate-spin" />
                                     : <RotateCcw size={12} />
                                 }
-                                {generatingPlan ? 'Generating...' : '1-Week Regenerate'}
+                                {generatingPlan ? 'Generating...' : '1-Week'}
                             </button>
                             <button
                                 onClick={handleGeneratePremiumPlan}
@@ -764,7 +764,7 @@ export default function DashboardPage() {
                                             <Crown size={10} />
                                             Pro
                                         </span>
-                                        <span>4-Week Regenerate</span>
+                                        <span>4-Week</span>
                                     </>
                                 )}
                             </button>
