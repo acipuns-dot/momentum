@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
 :root {
+  --momentum-bg-top: #f4f6ff;
+  --momentum-bg-bottom: #fdf7ff;
+  --momentum-glass: rgba(255, 255, 255, 0.82);
+  --momentum-glass-strong: rgba(255, 255, 255, 0.92);
+  --momentum-glass-border: rgba(148, 163, 184, 0.22);
+  --momentum-accent-soft: #fef0e7;
+
   --ui-space-1: 0.5rem;
   --ui-space-2: 0.75rem;
   --ui-space-3: 1rem;
@@ -73,6 +80,10 @@
   background-size: 20px 20px;
 }
 
+.momentum-bg {
+  background: linear-gradient(180deg, var(--momentum-bg-top) 0%, var(--momentum-bg-bottom) 100%);
+}
+
 .ui-page {
   max-width: 28rem;
   margin-inline: auto;
@@ -85,6 +96,29 @@
 
 .ui-elevated {
   box-shadow: var(--ui-shadow-elevated);
+}
+
+.ui-glass {
+  background: var(--momentum-glass);
+  border: 1px solid var(--momentum-glass-border);
+  backdrop-filter: blur(12px);
+}
+
+.ui-glass-strong {
+  background: var(--momentum-glass-strong);
+  border: 1px solid var(--momentum-glass-border);
+  backdrop-filter: blur(14px);
+}
+
+.ui-pill-nav {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--ui-shadow-elevated);
+}
+
+.ui-accent-soft {
+  background: var(--momentum-accent-soft);
 }
 
 .ui-label {

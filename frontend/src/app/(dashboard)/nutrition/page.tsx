@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import { Plus, Trash2, Flame } from 'lucide-react';
@@ -207,8 +207,8 @@ export default function NutritionPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 pb-28 font-sans">
-            <div className="bg-white px-6 pt-12 pb-6 border-b border-slate-100 shadow-sm sticky top-0 z-10">
+        <div className="min-h-screen momentum-bg dot-grid-subtle pb-28 font-sans ui-page">
+            <div className="ui-glass-strong px-6 pt-12 pb-6 border-b border-slate-100 ui-card sticky top-0 z-10">
                 <div className="flex justify-between items-start mb-5">
                     <div>
                         <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Today</p>
@@ -216,7 +216,7 @@ export default function NutritionPage() {
                     </div>
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center shadow-md shadow-primary-500/30"
+                        className="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center ui-elevated"
                     >
                         <Plus size={20} strokeWidth={3} />
                     </button>
@@ -237,11 +237,11 @@ export default function NutritionPage() {
                         { label: 'Carbs', val: loggedCarbs, target: targetCarbs, color: 'bg-orange-400' },
                         { label: 'Fat', val: loggedFat, target: targetFat, color: 'bg-red-400' },
                     ].map(({ label, val, target, color }) => (
-                        <div key={label} className="flex-1 bg-slate-50 border border-slate-100 rounded-2xl p-2.5 flex flex-col items-center">
+                        <div key={label} className="flex-1 ui-glass border border-slate-100 rounded-2xl p-2.5 flex flex-col items-center">
                             <div className="w-full h-1 bg-slate-200 rounded-full mb-2 overflow-hidden">
                                 <div className={`h-full ${color} rounded-full transition-all duration-500`} style={{ width: `${Math.min((val / target) * 100, 100)}%` }} />
                             </div>
-                            <span className="text-[11px] font-semibold text-slate-400">{label}</span>
+                            <span className="text-xs font-semibold text-slate-400">{label}</span>
                             <span className="text-sm font-bold text-slate-900">{val}g <span className="text-slate-300 font-medium text-xs">/ {target}g</span></span>
                         </div>
                     ))}
@@ -258,7 +258,7 @@ export default function NutritionPage() {
                         <div key={cat}>
                             <div className="flex justify-between items-center mb-3">
                                 <div className="flex items-center gap-2">
-                                    <div className={`w-8 h-8 ${bg} rounded-xl flex items-center justify-center text-[10px] font-bold text-slate-500`}>{cat}</div>
+                                    <div className={`w-8 h-8 ${bg} rounded-xl flex items-center justify-center text-xs font-bold text-slate-500`}>{cat}</div>
                                     <span className="font-extrabold text-slate-900">{cat}</span>
                                     {catKcal > 0 && (
                                         <span className="text-xs font-semibold text-slate-400 flex items-center gap-1">
@@ -275,7 +275,7 @@ export default function NutritionPage() {
                             {catMeals.length > 0 ? (
                                 <div className="space-y-2">
                                     {catMeals.map((meal) => (
-                                        <div key={meal.id} className="bg-white rounded-2xl px-4 py-3 flex items-center justify-between border border-slate-100 shadow-sm">
+                                        <div key={meal.id} className="ui-glass rounded-2xl px-4 py-3 flex items-center justify-between border border-slate-100 ui-card">
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-bold text-slate-900 text-sm truncate">{meal.name}</p>
                                                 <p className="text-xs text-slate-400 mt-0.5">
@@ -289,7 +289,7 @@ export default function NutritionPage() {
                                     ))}
                                 </div>
                             ) : (
-                                <button onClick={() => { setActiveCategory(cat); setIsModalOpen(true); }} className="w-full bg-white border border-dashed border-slate-200 rounded-2xl py-4 text-xs font-semibold text-slate-400">
+                                <button onClick={() => { setActiveCategory(cat); setIsModalOpen(true); }} className="w-full ui-glass border border-dashed border-slate-200 rounded-2xl py-4 text-xs font-semibold text-slate-500">
                                     <Plus size={13} strokeWidth={3} className="inline mr-1" /> Log {cat}
                                 </button>
                             )}
@@ -299,8 +299,8 @@ export default function NutritionPage() {
             </div>
 
             {isModalOpen && (
-                <div className="fixed inset-0 bg-slate-900/40 z-[60] flex items-end justify-center backdrop-blur-sm">
-                    <div className="bg-white rounded-t-3xl w-full max-w-md p-6 pb-10 shadow-2xl">
+                <div className="fixed inset-0 bg-slate-900/40 z-[60] flex items-end sm:items-center justify-center backdrop-blur-sm px-3 sm:px-4">
+                    <div className="ui-glass-strong rounded-t-3xl sm:rounded-[2rem] w-full max-w-md p-6 pb-[calc(2.5rem+env(safe-area-inset-bottom))] ui-elevated border border-slate-100">
                         <div className="flex justify-between items-center mb-5">
                             <h3 className="font-extrabold text-lg text-slate-900">Add to {activeCategory}</h3>
                             <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500">×</button>
@@ -311,7 +311,7 @@ export default function NutritionPage() {
                                 <button
                                     key={cat}
                                     onClick={() => setActiveCategory(cat)}
-                                    className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold transition-all ${activeCategory === cat ? 'bg-primary-500 text-white shadow-sm' : 'bg-slate-100 text-slate-500'}`}
+                                    className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-bold transition-all ${activeCategory === cat ? 'bg-primary-500 text-white ui-card' : 'bg-slate-100 text-slate-500'}`}
                                 >
                                     {cat}
                                 </button>
@@ -319,8 +319,8 @@ export default function NutritionPage() {
                         </div>
 
                         <div className="flex bg-slate-100 rounded-2xl p-1 mb-5">
-                            <button onClick={() => setUsePreset(true)} className={`flex-1 py-2 rounded-xl text-xs font-bold ${usePreset ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400'}`}>Quick Picks</button>
-                            <button onClick={() => setUsePreset(false)} className={`flex-1 py-2 rounded-xl text-xs font-bold ${!usePreset ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-400'}`}>Custom</button>
+                            <button onClick={() => setUsePreset(true)} className={`flex-1 py-2 rounded-xl text-xs font-bold ${usePreset ? 'bg-white text-slate-900 ui-card' : 'text-slate-400'}`}>Quick Picks</button>
+                            <button onClick={() => setUsePreset(false)} className={`flex-1 py-2 rounded-xl text-xs font-bold ${!usePreset ? 'bg-white text-slate-900 ui-card' : 'text-slate-400'}`}>Custom</button>
                         </div>
 
                         {usePreset && (
@@ -329,7 +329,7 @@ export default function NutritionPage() {
                                     <button
                                         key={i}
                                         onClick={() => addPreset(preset)}
-                                        className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-4 py-3 text-left"
+                                        className="w-full ui-glass border border-slate-100 rounded-2xl px-4 py-3 text-left"
                                     >
                                         <p className="font-bold text-slate-900 text-sm">{preset.name}</p>
                                         <p className="text-xs text-slate-400 mt-0.5">{preset.kcal} kcal · P {preset.protein}g · C {preset.carbs}g · F {preset.fat}g</p>
@@ -364,3 +364,5 @@ export default function NutritionPage() {
         </div>
     );
 }
+
+

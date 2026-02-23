@@ -169,7 +169,7 @@ export default function ProfilePage() {
         : 7;
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle pb-32 font-sans ui-page">
+        <div className="min-h-screen momentum-bg dot-grid-subtle pb-32 font-sans ui-page">
 
             {/* Header */}
             <div className="pt-12 px-6 pb-8 flex items-center justify-between">
@@ -179,7 +179,7 @@ export default function ProfilePage() {
                 </div>
                 <button
                     onClick={openEditModal}
-                    className="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-2 text-xs font-bold text-slate-700 hover:border-[#f97316] hover:text-[#f97316] transition-colors ui-card"
+                    className="flex items-center gap-2 ui-glass border border-slate-200 rounded-full px-4 py-2 text-xs font-bold text-slate-700 hover:border-[#f97316] hover:text-[#f97316] transition-colors ui-card"
                 >
                     <Pencil size={12} />
                     Edit Profile
@@ -187,7 +187,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Avatar Card */}
-            <div className="mx-6 mb-6 bg-white rounded-[2rem] p-6 ui-card border border-slate-100 flex items-center gap-5">
+            <div className="mx-6 mb-6 ui-glass-strong rounded-[2rem] p-6 ui-card border border-slate-100 flex items-center gap-5">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-400 to-[#f97316] flex items-center justify-center ui-elevated  flex-shrink-0">
                     <UserIcon size={28} className="text-white" strokeWidth={2.5} />
                 </div>
@@ -229,10 +229,10 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-2 gap-3">
                     {loading
                         ? Array.from({ length: 4 }).map((_, i) => (
-                            <div key={i} className="bg-white rounded-2xl p-4 ui-card border border-slate-100 h-20 animate-pulse" />
+                            <div key={i} className="ui-glass rounded-2xl p-4 ui-card border border-slate-100 h-20 animate-pulse" />
                         ))
                         : statCards.map((s, i) => (
-                            <div key={i} className="bg-white rounded-2xl p-4 ui-card border border-slate-100">
+                            <div key={i} className="ui-glass rounded-2xl p-4 ui-card border border-slate-100">
                                 <div className="flex items-center gap-2 mb-2">{s.icon}<span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{s.label}</span></div>
                                 <p className="text-base font-black text-slate-800 capitalize">{s.value}</p>
                             </div>
@@ -242,7 +242,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Achievement Badge */}
-            <div className="mx-6 mb-6 bg-gradient-to-r from-orange-50 to-amber-50 rounded-[2rem] p-5 border border-orange-100 flex items-center gap-4">
+            <div className="mx-6 mb-6 ui-accent-soft rounded-[2rem] p-5 border border-orange-100 flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center ui-card border border-orange-100 flex-shrink-0">
                     <Trophy size={22} className="text-[#f97316]" />
                 </div>
@@ -257,7 +257,7 @@ export default function ProfilePage() {
             {/* Account Actions */}
             <div className="px-6 mb-6">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Account</p>
-                <div className="bg-white rounded-[2rem] ui-card border border-slate-100 overflow-hidden divide-y divide-slate-50">
+                <div className="ui-glass rounded-[2rem] ui-card border border-slate-100 overflow-hidden divide-y divide-slate-50">
                     {user?.is_admin && (
                         <button
                             onClick={() => router.push('/admin')}
@@ -304,7 +304,7 @@ export default function ProfilePage() {
                 <div className="fixed inset-0 z-[70] flex items-end justify-center" onClick={() => setEditModal(false)}>
                     <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
                     <div
-                        className="relative bg-white rounded-t-[2rem] w-full max-w-md px-6 pt-6 pb-10 ui-elevated animate-in slide-in-from-bottom duration-300"
+                        className="relative ui-glass-strong rounded-t-[2rem] w-full max-w-md px-6 pt-6 pb-10 ui-elevated border border-slate-100 animate-in slide-in-from-bottom duration-300"
                         onClick={e => e.stopPropagation()}
                     >
                         {/* Drag handle */}
@@ -417,7 +417,7 @@ export default function ProfilePage() {
                     onClick={() => setPwModal(false)}>
                     <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
                     <div
-                        className="relative bg-white rounded-[2rem] p-6 w-full ui-elevated animate-in zoom-in-95 duration-200"
+                        className="relative ui-glass-strong rounded-[2rem] p-6 w-full ui-elevated border border-slate-100 animate-in zoom-in-95 duration-200"
                         onClick={e => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-6">

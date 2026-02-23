@@ -512,11 +512,11 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle text-slate-900 pb-32 font-sans selection:bg-orange-500 selection:text-white ui-page relative">
+        <div className="min-h-screen momentum-bg dot-grid-subtle text-slate-900 pb-32 font-sans selection:bg-orange-500 selection:text-white ui-page relative">
 
             <div className="pt-12 px-6 flex justify-between items-start mb-8">
                 <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-full bg-white ui-card border border-slate-100 flex items-center justify-center relative">
+                    <div className="w-14 h-14 rounded-full ui-glass-strong ui-card flex items-center justify-center relative">
                         {/* Inner orange ring with white square inside, mimicking the avatar in the image */}
                         <div className="w-12 h-12 rounded-full border-2 border-[#f97316] p-0.5 flex items-center justify-center">
                             <div className="w-full h-full bg-[#fcead7] rounded-full flex items-center justify-center">
@@ -530,7 +530,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
                 {/* Bell only — plan button moved to Daily Protocol section */}
-                <button className="w-10 h-10 rounded-full bg-white ui-card border border-slate-100 flex items-center justify-center relative mt-2">
+                <button className="w-10 h-10 rounded-full ui-glass-strong ui-card flex items-center justify-center relative mt-2">
                     <Bell size={18} className="text-slate-700 fill-slate-700" />
                     <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-[#f97316] border-2 border-white rounded-full"></span>
                 </button>
@@ -634,7 +634,7 @@ export default function DashboardPage() {
             <div className="px-6 space-y-16 mt-6">
 
                 {/* CALORIES SECTION */}
-                <div className="bg-white rounded-[2rem] py-6 px-6 ui-card border border-slate-100 mb-6 mx-6">
+                <div className="ui-glass-strong rounded-[2rem] py-6 px-6 ui-card mb-6 mx-6">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-lg font-bold text-slate-900">Energy Balance</h2>
                         <span className="text-sm font-bold text-[#f97316]">Today</span>
@@ -688,7 +688,7 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-2 gap-4 px-6 mb-8 mt-[-1rem]">
                     {/* Hydration */}
                     <div onClick={() => isToday && setIsWaterModalOpen(true)}
-                        className={`bg-white rounded-[2rem] p-5 ui-card border border-slate-100 flex flex-col justify-between transition-colors h-48 ${isToday ? 'cursor-pointer hover:border-blue-200' : 'cursor-default'}`}>
+                        className={`ui-glass rounded-[2rem] p-5 ui-card flex flex-col justify-between transition-colors h-48 ${isToday ? 'cursor-pointer hover:border-blue-200' : 'cursor-default'}`}>
                         <div className="flex items-center gap-2 mb-2">
                             <div className="bg-blue-50 p-1.5 rounded-full">
                                 <Droplet size={16} className="text-blue-500 fill-blue-500" />
@@ -705,7 +705,7 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Weight + BMI */}
-                    <div className="bg-white rounded-[2rem] p-5 ui-card border border-slate-100 flex flex-col gap-3 h-48">
+                    <div className="ui-glass rounded-[2rem] p-5 ui-card flex flex-col gap-3 h-48">
                         <div className="flex items-center gap-2">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#f97316]">
                                 <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
@@ -811,7 +811,7 @@ export default function DashboardPage() {
                                     {activeDay.nutritionTip && (
                                         <div className="relative animate-in fade-in slide-in-from-bottom-2 duration-500">
                                             <div className="absolute -left-[25px] top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-[#f97316] ring-[6px] ring-[#f8f9fa] z-10"></div>
-                                            <div className="bg-white rounded-2xl p-4 ui-card border border-slate-100 ml-4">
+                                            <div className="ui-glass rounded-2xl p-4 ui-card ml-4">
                                                 <div className="flex items-center gap-4 w-full">
                                                     <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-xl shadow-inner">💡</div>
                                                     <div className="flex-1 min-w-0">
@@ -828,7 +828,7 @@ export default function DashboardPage() {
                                             <div className="absolute -left-[25px] top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-slate-200 ring-[6px] ring-[#f8f9fa] z-10"></div>
                                             <div
                                                 onClick={() => setIsWorkoutBriefOpen(true)}
-                                                className={`bg-white rounded-2xl p-4 ui-card border border-slate-100 flex flex-col ml-4 transition-colors group hover:border-[#f97316]/50 cursor-pointer`}
+                                                className={`ui-glass rounded-2xl p-4 ui-card flex flex-col ml-4 transition-colors group hover:border-[#f97316]/50 cursor-pointer`}
                                             >
                                                 <div className="flex items-start justify-between mb-3">
                                                     <div className="flex items-center gap-4">
@@ -860,7 +860,7 @@ export default function DashboardPage() {
                                     {activeDay.type === 'rest' && (
                                         <div className="relative animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
                                             <div className="absolute -left-[25px] top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-slate-200 ring-[6px] ring-[#f8f9fa] z-10"></div>
-                                            <div className="bg-white rounded-2xl p-4 ui-card border border-slate-100 flex items-center gap-4 ml-4">
+                                            <div className="ui-glass rounded-2xl p-4 ui-card flex items-center gap-4 ml-4">
                                                 <div className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-xl shadow-inner">🧘</div>
                                                 <div>
                                                     <h4 className="text-sm font-bold text-slate-900">Active Recovery</h4>
@@ -894,7 +894,7 @@ export default function DashboardPage() {
             {
                 isMealModalOpen && (
                     <div className="fixed inset-0 bg-slate-900/40 z-[60] flex items-end sm:items-center justify-center p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200">
-                        <div className="bg-white rounded-3xl p-5 sm:p-6 w-full max-w-sm max-h-[85vh] overflow-y-auto pb-[calc(1.25rem+env(safe-area-inset-bottom))] ui-elevated border border-slate-100">
+                        <div className="ui-glass-strong rounded-3xl p-5 sm:p-6 w-full max-w-sm max-h-[85vh] overflow-y-auto pb-[calc(1.25rem+env(safe-area-inset-bottom))] ui-elevated border border-slate-100">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="font-bold text-lg text-slate-900">Log Meal</h3>
                                 <button onClick={() => setIsMealModalOpen(false)} className="text-slate-400 hover:text-slate-600 bg-slate-100 rounded-full p-2">
@@ -935,7 +935,7 @@ export default function DashboardPage() {
                             className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in"
                             onClick={() => setIsWaterModalOpen(false)}
                         ></div>
-                        <div className="bg-white rounded-[2rem] p-5 sm:p-6 w-full max-w-sm max-h-[85vh] overflow-y-auto pb-[calc(1.25rem+env(safe-area-inset-bottom))] relative z-10 ui-elevated animate-in zoom-in-95 duration-200">
+                        <div className="ui-glass-strong rounded-[2rem] p-5 sm:p-6 w-full max-w-sm max-h-[85vh] overflow-y-auto pb-[calc(1.25rem+env(safe-area-inset-bottom))] relative z-10 ui-elevated animate-in zoom-in-95 duration-200">
                             <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-4 mx-auto border border-blue-100">
                                 <Droplet className="text-blue-500" size={24} />
                             </div>
@@ -984,7 +984,7 @@ export default function DashboardPage() {
                             className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in"
                             onClick={() => setIsWorkoutBriefOpen(false)}
                         ></div>
-                        <div className="bg-white rounded-[2rem] p-5 sm:p-6 w-full max-w-md relative z-10 ui-elevated animate-in zoom-in-95 duration-200 flex flex-col max-h-[88vh] pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+                        <div className="ui-glass-strong rounded-[2rem] p-5 sm:p-6 w-full max-w-md relative z-10 ui-elevated animate-in zoom-in-95 duration-200 flex flex-col max-h-[88vh] pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
                             {/* Header */}
                             <div className="flex justify-between items-center mb-6">
                                 <div className="flex items-center gap-3">
@@ -1062,7 +1062,7 @@ export default function DashboardPage() {
             {isNoticeOpen && (
                 <div className="fixed inset-0 z-[85] flex items-center justify-center px-5">
                     <div className="absolute inset-0 bg-slate-900/45 backdrop-blur-sm" onClick={() => setIsNoticeOpen(false)} />
-                    <div className="relative w-full max-w-md bg-white rounded-[1.5rem] p-5 border border-slate-100 ui-elevated">
+                    <div className="relative w-full max-w-md ui-glass-strong rounded-[1.5rem] p-5 border border-slate-100 ui-elevated">
                         <button
                             onClick={() => setIsNoticeOpen(false)}
                             className="absolute right-3 top-3 w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"

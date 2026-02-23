@@ -25,7 +25,7 @@ export default function DashboardLayout({
     };
 
     return (
-        <div className="relative min-h-screen pb-[calc(7rem+env(safe-area-inset-bottom))] bg-[#f8f9fa] dot-grid-subtle max-w-md mx-auto overflow-hidden shadow-2xl shadow-slate-200/50">
+        <div className="relative min-h-screen pb-[calc(7rem+env(safe-area-inset-bottom))] momentum-bg dot-grid-subtle ui-page overflow-hidden">
             {children}
 
             {/* ── FAB Choice Bottom Sheet ───────────────────────────────── */}
@@ -39,7 +39,7 @@ export default function DashboardLayout({
 
                     {/* Sheet */}
                     <div
-                        className="relative bg-white rounded-t-[2.5rem] px-6 pt-5 pb-36 shadow-2xl animate-in slide-in-from-bottom-4 duration-300"
+                        className="relative ui-glass-strong rounded-t-[2.5rem] px-6 pt-5 pb-36 ui-elevated border border-slate-100 animate-in slide-in-from-bottom-4 duration-300"
                         onClick={e => e.stopPropagation()}
                     >
                         <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-6" />
@@ -87,17 +87,17 @@ export default function DashboardLayout({
             )}
 
             {/* ── Bottom Navigation ─────────────────────────────────────── */}
-            <nav className="fixed bottom-0 left-0 right-0 w-full bg-white border-t border-slate-100/60 z-50 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.1)] rounded-t-[2rem] h-[calc(80px+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)]">
+            <nav className="fixed bottom-3 left-3 right-3 z-50 rounded-[2rem] ui-pill-nav h-[calc(80px+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)]">
                 <div className="flex justify-between items-center h-[80px] px-8 max-w-md mx-auto relative">
 
                     <Link href="/" className={`flex flex-col items-center justify-center w-[50px] h-full transition-colors group ${isActive('/') ? 'text-[#f97316]' : 'text-slate-400 hover:text-slate-600'}`}>
                         <Home size={24} className={`mb-1 ${isActive('/') ? 'fill-current' : 'group-hover:scale-110 transition-transform'}`} strokeWidth={isActive('/') ? 2.5 : 2} />
-                        <span className="text-[10px] font-bold">Home</span>
+                        <span className="text-xs font-bold">Home</span>
                     </Link>
 
                     <Link href="/progress" className={`flex flex-col items-center justify-center w-[50px] h-full transition-colors group ${isActive('/progress') ? 'text-[#f97316]' : 'text-slate-400 hover:text-slate-600'}`}>
                         <LineChart size={24} className={`mb-1 ${isActive('/progress') ? '' : 'group-hover:scale-110 transition-transform'}`} strokeWidth={isActive('/progress') ? 2.5 : 2} />
-                        <span className="text-[10px] font-bold">Progress</span>
+                        <span className="text-xs font-bold">Progress</span>
                     </Link>
 
                     {/* FAB */}
@@ -105,19 +105,19 @@ export default function DashboardLayout({
                         onClick={() => setFabOpen(true)}
                         className="flex flex-col items-center justify-center w-[64px] h-full relative -top-8 group"
                     >
-                        <div className={`text-white w-[60px] h-[60px] rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ring-4 ring-[#f8f9fa] ${fabOpen ? 'bg-slate-700 rotate-45 shadow-slate-700/30' : 'bg-[#f97316] shadow-[#f97316]/40 group-hover:scale-105'}`}>
+                        <div className={`text-white w-[60px] h-[60px] rounded-full flex items-center justify-center ui-elevated transition-all duration-300 ring-4 ring-[#f8f9fa] ${fabOpen ? 'bg-slate-700 rotate-45' : 'bg-[#f97316] group-hover:scale-105'}`}>
                             <Plus size={32} strokeWidth={2.5} />
                         </div>
                     </button>
 
                     <Link href="/exercises" className={`flex flex-col items-center justify-center w-[50px] h-full transition-colors group ${isActive('/exercises') ? 'text-[#f97316]' : 'text-slate-400 hover:text-slate-600'}`}>
                         <Dumbbell size={24} className={`mb-1 ${isActive('/exercises') ? '' : 'group-hover:scale-110 transition-transform'}`} strokeWidth={isActive('/exercises') ? 2.5 : 2} />
-                        <span className="text-[10px] font-bold">Workouts</span>
+                        <span className="text-xs font-bold">Workouts</span>
                     </Link>
 
                     <Link href="/profile" className={`flex flex-col items-center justify-center w-[50px] h-full transition-colors group ${isActive('/profile') ? 'text-[#f97316]' : 'text-slate-400 hover:text-slate-600'}`}>
                         <User size={24} className={`mb-1 ${isActive('/profile') ? '' : 'group-hover:scale-110 transition-transform'}`} strokeWidth={isActive('/profile') ? 2.5 : 2} />
-                        <span className="text-[10px] font-bold">Profile</span>
+                        <span className="text-xs font-bold">Profile</span>
                     </Link>
 
                 </div>

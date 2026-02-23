@@ -120,7 +120,7 @@ export default function ProgressPage() {
     }).join(' ');
 
     return (
-        <div className="min-h-screen bg-[#f8f9fa] dot-grid-subtle text-slate-900 pb-32 font-sans selection:bg-orange-500 selection:text-white ui-page">
+        <div className="min-h-screen momentum-bg dot-grid-subtle text-slate-900 pb-32 font-sans selection:bg-orange-500 selection:text-white ui-page">
             {/* Header */}
             <div className="pt-12 px-6 mb-8 flex items-center justify-between">
                 <div>
@@ -138,7 +138,7 @@ export default function ProgressPage() {
             <div className="px-6 space-y-6">
 
                 {/* Master Overview Card */}
-                <div className="bg-white rounded-[2rem] p-6 ui-card border border-slate-100 relative overflow-hidden">
+                <div className="ui-glass-strong rounded-[2rem] p-6 ui-card relative overflow-hidden">
                     <div className="flex justify-between items-start mb-6">
                         <div className="flex items-center gap-2">
                             <Scale size={20} className="text-[#f97316]" />
@@ -176,7 +176,7 @@ export default function ProgressPage() {
                 </div>
 
                 {/* The Chart */}
-                <div className="bg-white rounded-[2rem] p-6 ui-card border border-slate-100">
+                <div className="ui-glass rounded-[2rem] p-6 ui-card">
                     <div className="flex items-center gap-2 mb-6">
                         <LineChart size={20} className="text-blue-500" />
                         <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Weight Trend</h2>
@@ -271,7 +271,7 @@ export default function ProgressPage() {
                 </div>
 
                 {/* History List */}
-                <div className="bg-white rounded-[2rem] p-6 ui-card border border-slate-100">
+                <div className="ui-glass rounded-[2rem] p-6 ui-card">
                     <div className="flex items-center gap-2 mb-6">
                         <CalendarDays size={20} className="text-purple-500" />
                         <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">History</h2>
@@ -300,7 +300,7 @@ export default function ProgressPage() {
                         className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in"
                         onClick={() => setIsLogModalOpen(false)}
                     ></div>
-                    <div className="bg-white rounded-[2rem] p-6 w-full max-w-sm relative z-10 ui-elevated animate-in zoom-in-95 duration-200">
+                    <div className="ui-glass-strong rounded-[2rem] p-6 w-full max-w-sm relative z-10 ui-elevated border border-slate-100 animate-in zoom-in-95 duration-200">
                         <div className="w-12 h-12 rounded-full bg-orange-50 flex items-center justify-center mb-4 mx-auto border border-orange-100">
                             <Scale className="text-[#f97316]" size={24} />
                         </div>

@@ -20,13 +20,13 @@ export default function PremiumPaywallModal({
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-[80] flex items-end justify-center sm:items-center px-4">
+        <div className="fixed inset-0 z-[80] flex items-end justify-center sm:items-center px-3 sm:px-4">
             <div
                 className="absolute inset-0 bg-slate-900/45 backdrop-blur-sm"
                 onClick={onClose}
             />
 
-            <div className="relative w-full max-w-md bg-white rounded-[2rem] p-6 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200">
+            <div className="relative w-full max-w-md ui-glass-strong rounded-t-[2rem] sm:rounded-[2rem] p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] ui-elevated border border-slate-100 animate-in zoom-in-95 duration-200">
                 <button
                     onClick={onClose}
                     className="absolute right-4 top-4 w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"
@@ -35,7 +35,7 @@ export default function PremiumPaywallModal({
                     <X size={16} />
                 </button>
 
-                <div className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center mb-4 shadow-inner">
+                <div className="w-14 h-14 rounded-2xl status-active border flex items-center justify-center mb-4">
                     <Crown size={28} />
                 </div>
 
@@ -61,7 +61,7 @@ export default function PremiumPaywallModal({
                     href={whatsappUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="w-full inline-flex items-center justify-center py-3.5 rounded-2xl bg-[#25D366] text-white text-sm font-black shadow-lg shadow-emerald-500/30"
+                    className="w-full inline-flex items-center justify-center py-3.5 rounded-2xl bg-[#25D366] text-white text-sm font-black ui-elevated"
                 >
                     Contact on WhatsApp
                 </a>
