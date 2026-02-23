@@ -56,7 +56,18 @@ export default function NutritionPage() {
         const pb = getPB();
 
         pb.collection('profiles_db').getFullList({ filter: `user = "${user.id}"` })
-            .then((res) => setProfile(res[0] || null))
+            .then((res) => {
+                const first = res[0];
+                if (!first) {
+                    setProfile(null);
+                    return;
+                }
+                setProfile({
+                    current_weight: typeof first.current_weight === 'number' ? first.current_weight : undefined,
+                    goal_weight: typeof first.goal_weight === 'number' ? first.goal_weight : undefined,
+                    activity_level: typeof first.activity_level === 'string' ? first.activity_level : undefined,
+                });
+            })
             .catch(console.error);
 
         const start = new Date();
