@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { useAuth } from '@/lib/auth';
 import { getPB } from '@/lib/pb';
 import { calcNutritionTargets } from '@/lib/nutritionTargets';
+import PremiumPaywallModal from '@/components/PremiumPaywallModal';
 
 export default function DashboardPage() {
     const { user } = useAuth();
@@ -26,7 +27,9 @@ export default function DashboardPage() {
     const [isWorkoutBriefOpen, setIsWorkoutBriefOpen] = useState(false);
     const [nutritionRecordId, setNutritionRecordId] = useState<string | null>(null);
     const [generatingPlan, setGeneratingPlan] = useState(false);
+    const [generatingPremiumPlan, setGeneratingPremiumPlan] = useState(false);
     const [weeklyWeightChange, setWeeklyWeightChange] = useState<number | null>(null);
+    const [isPaywallOpen, setIsPaywallOpen] = useState(false);
 
     // Animation States
     const [animatedKcal, setAnimatedKcal] = useState(0);
@@ -47,6 +50,11 @@ export default function DashboardPage() {
     const targetProtein = plan?.targetProtein || computed.targetProtein;
     const targetCarbs = plan?.targetCarbs || computed.targetCarbs;
     const targetFat = plan?.targetFat || computed.targetFat;
+    const premiumUntilMs = user?.premium_until ? new Date(user.premium_until).getTime() : 0;
+    const isPremiumActive = !!user?.is_premium && premiumUntilMs > Date.now();
+    const premiumDaysLeft = isPremiumActive ? Math.ceil((premiumUntilMs - Date.now()) / (1000 * 60 * 60 * 24)) : null;
+    const showPremiumExpiryWarning = isPremiumActive && premiumDaysLeft !== null && premiumDaysLeft <= 3;
+    const whatsappUpgradeUrl = process.env.NEXT_PUBLIC_WHATSAPP_UPGRADE_URL || 'https://wa.me/';
 
     // Progress Calculation
     // Use the actual loggedKcal for the final value, but draw the progress based on animation
@@ -342,6 +350,56 @@ export default function DashboardPage() {
         }
     };
 
+    const handleGeneratePremiumPlan = async () => {
+        if (!user || !profile || generatingPremiumPlan) return;
+        if (!isPremiumActive) {
+            setIsPaywallOpen(true);
+            return;
+        }
+
+        setGeneratingPremiumPlan(true);
+        try {
+            const pb = getPB();
+            let firstWeekPlan: any = null;
+
+            for (let i = 0; i < 4; i++) {
+                const res = await fetch(process.env.NEXT_PUBLIC_API_URL + '/generate-plan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${pb.authStore.token}`,
+                    },
+                    body: JSON.stringify({
+                        userId: user.id,
+                        currentWeight: profile.current_weight,
+                        goalWeight: profile.goal_weight,
+                        weekOffset: i,
+                    })
+                });
+
+                if (!res.ok) {
+                    if (res.status === 403) {
+                        setIsPaywallOpen(true);
+                        return;
+                    }
+                    throw new Error('Failed to generate premium plan');
+                }
+
+                const data = await res.json();
+                if (i === 0) firstWeekPlan = data;
+            }
+
+            if (firstWeekPlan) {
+                localStorage.setItem('weeklyPlan', JSON.stringify(firstWeekPlan));
+                setPlan(firstWeekPlan);
+            }
+        } catch (e) {
+            console.error('Premium plan generation failed', e);
+        } finally {
+            setGeneratingPremiumPlan(false);
+        }
+    };
+
     const handleSaveMealLog = async () => {
         if (!mealCalories || !user) return;
         const addKcal = Number(mealCalories);
@@ -440,6 +498,38 @@ export default function DashboardPage() {
                     <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-[#f97316] border-2 border-white rounded-full"></span>
                 </button>
             </div>
+
+            {!isPremiumActive && (
+                <div className="mx-6 mb-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-100 rounded-2xl p-4 flex items-center justify-between gap-3">
+                    <div>
+                        <p className="text-xs font-black text-amber-700 uppercase tracking-wider">Premium Feature</p>
+                        <p className="text-xs font-semibold text-amber-700 mt-0.5">Unlock 4-week AI plans and progression.</p>
+                    </div>
+                    <button
+                        onClick={() => setIsPaywallOpen(true)}
+                        className="px-3 py-2 rounded-xl bg-amber-500 text-white text-xs font-black shadow-sm whitespace-nowrap"
+                    >
+                        Upgrade
+                    </button>
+                </div>
+            )}
+
+            {showPremiumExpiryWarning && (
+                <div className="mx-6 mb-4 bg-rose-50 border border-rose-100 rounded-2xl p-4 flex items-center justify-between gap-3">
+                    <div>
+                        <p className="text-xs font-black text-rose-700 uppercase tracking-wider">Premium Expiring</p>
+                        <p className="text-xs font-semibold text-rose-700 mt-0.5">
+                            Expires in {premiumDaysLeft} day{premiumDaysLeft === 1 ? '' : 's'}.
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => setIsPaywallOpen(true)}
+                        className="px-3 py-2 rounded-xl bg-rose-500 text-white text-xs font-black shadow-sm whitespace-nowrap"
+                    >
+                        Renew
+                    </button>
+                </div>
+            )}
 
             {/* Calendar Strip */}
             <div
@@ -627,17 +717,33 @@ export default function DashboardPage() {
                             <Calendar size={20} className="text-[#f97316]" strokeWidth={2.5} />
                             <h2 className="text-lg font-bold">Daily Protocol</h2>
                         </div>
-                        <button
-                            onClick={() => { localStorage.removeItem('weeklyPlan'); handleGeneratePlan(); }}
-                            disabled={generatingPlan || !profile}
-                            className="flex items-center gap-1.5 bg-orange-50 hover:bg-orange-100 disabled:opacity-40 text-[#f97316] border border-orange-200 text-[11px] font-black px-3 py-1.5 rounded-full transition-all active:scale-95"
-                        >
-                            {generatingPlan
-                                ? <Loader2 size={12} className="animate-spin" />
-                                : <span className="text-xs">✨</span>
-                            }
-                            {generatingPlan ? 'Generating...' : 'Regenerate'}
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => { localStorage.removeItem('weeklyPlan'); handleGeneratePlan(); }}
+                                disabled={generatingPlan || !profile}
+                                className="flex items-center gap-1.5 bg-orange-50 hover:bg-orange-100 disabled:opacity-40 text-[#f97316] border border-orange-200 text-[11px] font-black px-3 py-1.5 rounded-full transition-all active:scale-95"
+                            >
+                                {generatingPlan
+                                    ? <Loader2 size={12} className="animate-spin" />
+                                    : <span className="text-xs">↻</span>
+                                }
+                                {generatingPlan ? 'Generating...' : 'Regenerate'}
+                            </button>
+                            <button
+                                onClick={handleGeneratePremiumPlan}
+                                disabled={generatingPremiumPlan || !profile}
+                                className={`flex items-center gap-1.5 border text-[11px] font-black px-3 py-1.5 rounded-full transition-all active:scale-95 ${isPremiumActive
+                                    ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border-emerald-200'
+                                    : 'bg-slate-100 hover:bg-slate-200 text-slate-500 border-slate-200'
+                                    } disabled:opacity-40`}
+                            >
+                                {generatingPremiumPlan
+                                    ? <Loader2 size={12} className="animate-spin" />
+                                    : <span className="text-xs">Pro</span>
+                                }
+                                {generatingPremiumPlan ? 'Generating...' : '4-Week Pro'}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="relative pl-5 space-y-6 before:absolute before:inset-y-6 before:left-[25px] before:w-[2px] before:bg-slate-100">
@@ -890,6 +996,12 @@ export default function DashboardPage() {
                     </div>
                 )
             }
+
+            <PremiumPaywallModal
+                open={isPaywallOpen}
+                onClose={() => setIsPaywallOpen(false)}
+                whatsappUrl={whatsappUpgradeUrl}
+            />
 
         </div >
     );
