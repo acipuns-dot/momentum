@@ -30,7 +30,6 @@ export default function DashboardPage() {
     const [generatingPremiumPlan, setGeneratingPremiumPlan] = useState(false);
     const [weeklyWeightChange, setWeeklyWeightChange] = useState<number | null>(null);
     const [isPaywallOpen, setIsPaywallOpen] = useState(false);
-    const [hasRefreshedToday, setHasRefreshedToday] = useState(false);
 
     // Animation States
     const [animatedKcal, setAnimatedKcal] = useState(0);
@@ -271,16 +270,6 @@ export default function DashboardPage() {
         fetchUserData();
     }, [user]);
 
-    useEffect(() => {
-        if (!user) {
-            setHasRefreshedToday(false);
-            return;
-        }
-        const today = new Date().toISOString().split('T')[0];
-        const lastRefreshDay = localStorage.getItem(`plan_refresh_day_${user.id}`);
-        setHasRefreshedToday(lastRefreshDay === today);
-    }, [user]);
-
     // Re-fetch hydration & nutrition when user taps a different date
     useEffect(() => {
         if (skipFirstDateEffect.current) { skipFirstDateEffect.current = false; return; }
@@ -334,10 +323,6 @@ export default function DashboardPage() {
     // ── Manual plan generation ──────────────────────────────────────────────
     const handleGeneratePlan = async () => {
         if (!user || !profile || generatingPlan) return;
-        if (hasRefreshedToday) {
-            alert('You already refreshed your plan today. Try again tomorrow.');
-            return;
-        }
         setGeneratingPlan(true);
         try {
             const pb = getPB();
@@ -358,12 +343,16 @@ export default function DashboardPage() {
                 const data = await res.json();
                 localStorage.setItem('weeklyPlan', JSON.stringify(data));
                 setPlan(data);
-                const today = new Date().toISOString().split('T')[0];
-                localStorage.setItem(`plan_refresh_day_${user.id}`, today);
-                setHasRefreshedToday(true);
             } else if (res.status === 429) {
                 const payload = await res.json().catch(() => null);
-                alert(payload?.error || 'Daily refresh limit reached. Try again tomorrow.');
+                alert(payload?.error || 'Refresh limit reached for this 30-day window.');
+                if (!isPremiumActive) {
+                    setIsPaywallOpen(true);
+                }
+            } else if (res.status === 403) {
+                const payload = await res.json().catch(() => null);
+                if (payload?.error) alert(payload.error);
+                setIsPaywallOpen(true);
             }
         } catch (e) {
             console.error('Plan generation failed', e);
@@ -402,6 +391,11 @@ export default function DashboardPage() {
                 if (!res.ok) {
                     if (res.status === 403) {
                         setIsPaywallOpen(true);
+                        return;
+                    }
+                    if (res.status === 429) {
+                        const payload = await res.json().catch(() => null);
+                        alert(payload?.error || 'Premium generation limit reached for this 30-day window.');
                         return;
                     }
                     throw new Error('Failed to generate premium plan');
@@ -741,18 +735,15 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex items-center gap-2">
                             <button
-                                onClick={() => { localStorage.removeItem('weeklyPlan'); handleGeneratePlan(); }}
-                                disabled={generatingPlan || !profile || hasRefreshedToday}
-                                className={`flex items-center gap-1.5 border text-[11px] font-black px-3 py-1.5 rounded-full transition-all active:scale-95 disabled:opacity-40 ${hasRefreshedToday
-                                    ? 'bg-slate-100 text-slate-500 border-slate-200'
-                                    : 'bg-orange-50 hover:bg-orange-100 text-[#f97316] border-orange-200'
-                                    }`}
+                                onClick={handleGeneratePlan}
+                                disabled={generatingPlan || !profile}
+                                className="flex items-center gap-1.5 border text-[11px] font-black px-3 py-1.5 rounded-full transition-all active:scale-95 disabled:opacity-40 bg-orange-50 hover:bg-orange-100 text-[#f97316] border-orange-200"
                             >
                                 {generatingPlan
                                     ? <Loader2 size={12} className="animate-spin" />
                                     : <RotateCcw size={12} />
                                 }
-                                {generatingPlan ? 'Generating...' : hasRefreshedToday ? 'Tomorrow' : 'Refresh Plan'}
+                                {generatingPlan ? 'Generating...' : '1-Week Regenerate'}
                             </button>
                             <button
                                 onClick={handleGeneratePremiumPlan}
@@ -773,7 +764,7 @@ export default function DashboardPage() {
                                             <Crown size={10} />
                                             Pro
                                         </span>
-                                        <span>4-Week Plan</span>
+                                        <span>4-Week Regenerate</span>
                                     </>
                                 )}
                             </button>

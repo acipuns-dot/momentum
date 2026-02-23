@@ -15,7 +15,7 @@ export default function PremiumPaywallModal({
     onClose,
     whatsappUrl,
     title = 'Unlock Premium',
-    subtitle = 'Get 4-week AI plans, smarter progression, and premium coaching flow.',
+    subtitle = 'Get 4-week AI plans, higher refresh limits, and premium coaching flow.',
 }: PremiumPaywallModalProps) {
     if (!open) return null;
 
@@ -47,7 +47,10 @@ export default function PremiumPaywallModal({
                         <Sparkles size={14} className="text-amber-500" /> 4-week adaptive AI plans
                     </div>
                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                        <Sparkles size={14} className="text-amber-500" /> Faster weekly progression
+                        <Sparkles size={14} className="text-amber-500" /> 10 plan refreshes every 30 days
+                    </div>
+                    <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                        <Sparkles size={14} className="text-amber-500" /> 2 full 4-week generations every 30 days
                     </div>
                     <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
                         <Sparkles size={14} className="text-amber-500" /> Priority feature access
@@ -66,4 +69,3 @@ export default function PremiumPaywallModal({
         </div>
     );
 }
-

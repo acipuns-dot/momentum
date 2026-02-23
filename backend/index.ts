@@ -174,21 +174,60 @@ app.post('/generate-plan', async (req: Request, res: Response): Promise<any> => 
             return res.status(403).json({ error: 'Premium is required to generate multi-week plans.' });
         }
 
-        // Free users can refresh the base weekly plan once per day.
-        if (!isPremium && weekOffset === 0 && refreshRequested) {
-            const dayStart = new Date();
-            dayStart.setHours(0, 0, 0, 0);
-            const dayEnd = new Date(dayStart);
-            dayEnd.setDate(dayEnd.getDate() + 1);
+        // Premium users can refresh the base weekly plan up to 10 times per rolling 30-day window.
+        if (isPremium && weekOffset === 0 && refreshRequested) {
+            const windowStart = new Date();
+            windowStart.setDate(windowStart.getDate() - 30);
+            const now = new Date();
+            const nearFuture = new Date(now);
+            nearFuture.setDate(nearFuture.getDate() + 1);
 
-            const todayBasePlans = await pb.collection('weekly_plans_db').getList(1, 1, {
-                filter: `user = "${userId}" && start_date >= "${dayStart.toISOString()}" && start_date < "${dayEnd.toISOString()}"`,
+            const premiumBaseRefreshes = await pb.collection('weekly_plans_db').getList(1, 1, {
+                filter: `user = "${userId}" && created >= "${windowStart.toISOString()}" && start_date >= "${windowStart.toISOString()}" && start_date <= "${nearFuture.toISOString()}"`,
+                sort: '-created',
+            });
+
+            if (premiumBaseRefreshes.totalItems >= 10) {
+                return res.status(429).json({
+                    error: 'Premium cap reached: 10 refreshes per 30 days.',
+                });
+            }
+        }
+
+        // Free users can refresh the base weekly plan up to 2 times per rolling 30-day window.
+        if (!isPremium && weekOffset === 0 && refreshRequested) {
+            const windowStart = new Date();
+            windowStart.setDate(windowStart.getDate() - 30);
+            const nowIso = new Date().toISOString();
+
+            const recentBasePlans = await pb.collection('weekly_plans_db').getList(1, 2, {
+                filter: `user = "${userId}" && start_date >= "${windowStart.toISOString()}" && start_date <= "${nowIso}"`,
                 sort: '-start_date',
             });
 
-            if (todayBasePlans.totalItems > 0) {
+            if (recentBasePlans.totalItems >= 2) {
                 return res.status(429).json({
-                    error: 'Daily refresh limit reached. You can refresh again tomorrow.',
+                    error: 'Free users can refresh up to 2 times every 30 days. Upgrade to premium for more.',
+                });
+            }
+        }
+
+        // Premium 4-week generations are capped to 2 full runs per 30 days.
+        // A full run creates 3 "future week" plans (weekOffset 1..3), so cap at 6 future-week plans.
+        if (isPremium && weekOffset > 0) {
+            const windowStart = new Date();
+            windowStart.setDate(windowStart.getDate() - 30);
+            const futureWeekThreshold = new Date();
+            futureWeekThreshold.setDate(futureWeekThreshold.getDate() + 6);
+
+            const premiumFuturePlans = await pb.collection('weekly_plans_db').getList(1, 1, {
+                filter: `user = "${userId}" && created >= "${windowStart.toISOString()}" && start_date >= "${futureWeekThreshold.toISOString()}"`,
+                sort: '-created',
+            });
+
+            if (premiumFuturePlans.totalItems >= 6) {
+                return res.status(429).json({
+                    error: 'Premium cap reached: 2 full 4-week generations per 30 days.',
                 });
             }
         }
