@@ -13,6 +13,8 @@ type Exercise = {
     target: string;
     bodyPart: string;
     equipment: string;
+    equipment_type?: string;
+    equipment_list?: string[];
     gifUrl: string;
     secondaryMuscles: string[];
     instructions: string[];
@@ -30,10 +32,22 @@ const TARGETS = [
     { label: 'Calves', value: 'calves', emoji: '🦿' },
 ];
 
+const EQUIPMENT_FILTERS = [
+    { label: 'All', value: 'all' },
+    { label: 'No Equipment', value: 'none' },
+    { label: 'Jump Rope', value: 'jump_rope' },
+    { label: 'Treadmill', value: 'treadmill' },
+    { label: 'Dumbbell', value: 'dumbbell' },
+    { label: 'Band', value: 'band' },
+    { label: 'Barbell', value: 'barbell' },
+    { label: 'Machine', value: 'machine' },
+];
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function ExercisesPage() {
     const [selected, setSelected] = useState(TARGETS[0]);
+    const [selectedEquipment, setSelectedEquipment] = useState(EQUIPMENT_FILTERS[0].value);
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -52,12 +66,13 @@ export default function ExercisesPage() {
         return map[bodyPart?.toLowerCase()] || '🏋️';
     };
 
-    const fetchByTarget = useCallback(async (target: string) => {
+    const fetchByTarget = useCallback(async (target: string, equipment = selectedEquipment) => {
         setLoading(true);
         setError('');
         setExercises([]);
         try {
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/exercises?target=${encodeURIComponent(target)}&limit=12`);
+            const equipmentQuery = equipment !== 'all' ? `&equipment=${encodeURIComponent(equipment)}` : '';
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/exercises?target=${encodeURIComponent(target)}&limit=12${equipmentQuery}`);
             if (!res.ok) throw new Error('API error');
             const data = await res.json();
             setExercises(Array.isArray(data) ? data : []);
@@ -66,7 +81,7 @@ export default function ExercisesPage() {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [selectedEquipment]);
 
     const fetchBySearch = useCallback(async (name: string) => {
         if (!name.trim()) return;
@@ -87,12 +102,12 @@ export default function ExercisesPage() {
     }, []);
 
     // Load first target on mount
-    useEffect(() => { fetchByTarget(selected.value); }, []);
+    useEffect(() => { fetchByTarget(selected.value, selectedEquipment); }, [selected.value, selectedEquipment, fetchByTarget]);
 
     const handleTargetClick = (t: typeof TARGETS[0], el?: HTMLButtonElement | null) => {
         setSelected(t);
         setSearch('');
-        fetchByTarget(t.value);
+        fetchByTarget(t.value, selectedEquipment);
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     };
 
@@ -142,6 +157,25 @@ export default function ExercisesPage() {
                                     : 'ui-glass border border-slate-200 text-slate-600 hover:border-slate-300'}`}
                             >
                                 <span>{t.emoji}</span> {t.label}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
+                {!search && (
+                    <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+                        {EQUIPMENT_FILTERS.map(filter => (
+                            <button
+                                key={filter.value}
+                                onClick={() => {
+                                    setSelectedEquipment(filter.value);
+                                    fetchByTarget(selected.value, filter.value);
+                                }}
+                                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all ${selectedEquipment === filter.value
+                                    ? 'bg-slate-900 text-white'
+                                    : 'ui-glass border border-slate-200 text-slate-600 hover:border-slate-300'}`}
+                            >
+                                {filter.label}
                             </button>
                         ))}
                     </div>

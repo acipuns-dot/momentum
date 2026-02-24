@@ -92,6 +92,118 @@ const hasActivePremium = (userRecord: any): boolean => {
     return expiryMs > Date.now();
 };
 
+const ONBOARDING_EQUIPMENT_MAP: Record<string, string> = {
+    none: 'none',
+    gym: 'gym',
+    jump_rope: 'jump_rope',
+    dumbbells: 'dumbbell',
+    dumbbell: 'dumbbell',
+    resistance_bands: 'band',
+    band: 'band',
+    pull_up_bar: 'pull_up_bar',
+    kettlebell: 'kettlebell',
+    treadmill: 'treadmill',
+    threadmill: 'treadmill',
+};
+
+const RAW_EQUIPMENT_MAP: Record<string, string[]> = {
+    'body weight': ['none'],
+    bodyweight: ['none'],
+    'weighted': ['weighted'],
+    dumbbell: ['dumbbell'],
+    'dumbbell (used as handles for deeper range)': ['dumbbell'],
+    'dumbbell, exercise ball': ['dumbbell', 'exercise_ball'],
+    barbell: ['barbell'],
+    'ez barbell': ['ez_barbell'],
+    'ez barbell, exercise ball': ['ez_barbell', 'exercise_ball'],
+    'olympic barbell': ['barbell'],
+    'trap bar': ['trap_bar'],
+    cable: ['cable'],
+    'leverage machine': ['machine'],
+    'smith machine': ['smith_machine'],
+    'sled machine': ['sled'],
+    kettlebell: ['kettlebell'],
+    band: ['band'],
+    'resistance band': ['band'],
+    'body weight (with resistance band)': ['band'],
+    rope: ['jump_rope'],
+    'jump rope': ['jump_rope'],
+    'stability ball': ['stability_ball'],
+    'exercise ball': ['exercise_ball'],
+    'medicine ball': ['medicine_ball'],
+    'bosu ball': ['bosu_ball'],
+    assisted: ['assisted'],
+    'assisted (towel)': ['assisted'],
+    roller: ['roller'],
+    'wheel roller': ['ab_wheel'],
+    hammer: ['hammer'],
+    'stationary bike': ['stationary_bike'],
+    'upper body ergometer': ['ergometer'],
+    'elliptical machine': ['elliptical'],
+    'stepmill machine': ['stepmill'],
+};
+
+const slugEquipment = (value: string): string => value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, 'and')
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s-]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+
+const unique = (items: string[]): string[] => Array.from(new Set(items.filter(Boolean)));
+
+const normalizeExerciseEquipment = (rawValue: unknown): string[] => {
+    if (typeof rawValue !== 'string' || !rawValue.trim()) return ['none'];
+    const raw = rawValue.toLowerCase().trim();
+
+    if (RAW_EQUIPMENT_MAP[raw]) {
+        return unique(RAW_EQUIPMENT_MAP[raw]);
+    }
+
+    const parts = raw
+        .split(',')
+        .map((part) => part.trim())
+        .filter(Boolean);
+
+    const mapped = parts.flatMap((part) => {
+        if (RAW_EQUIPMENT_MAP[part]) return RAW_EQUIPMENT_MAP[part];
+        if (part.includes('body weight')) return ['none'];
+        if (part.includes('resistance band')) return ['band'];
+        if (part.includes('jump rope')) return ['jump_rope'];
+        if (part.includes('treadmill') || part.includes('threadmill')) return ['treadmill'];
+        return [slugEquipment(part)];
+    });
+
+    const result = unique(mapped);
+    return result.length ? result : ['none'];
+};
+
+const primaryEquipmentType = (equipmentList: string[]): string => {
+    const first = equipmentList[0] || 'none';
+    if (!equipmentList.length) return 'none';
+    if (equipmentList.length === 1) return first;
+    return equipmentList.find((eq) => eq !== 'none') || first;
+};
+
+const normalizeUserEquipment = (rawList: unknown, options: { defaultNone?: boolean } = {}): string[] => {
+    const defaultNone = options.defaultNone ?? true;
+    if (!Array.isArray(rawList)) return defaultNone ? ['none'] : [];
+    const normalized = rawList
+        .map((entry) => typeof entry === 'string' ? entry.toLowerCase().trim() : '')
+        .filter(Boolean)
+        .flatMap((entry) => {
+            if (ONBOARDING_EQUIPMENT_MAP[entry]) return [ONBOARDING_EQUIPMENT_MAP[entry]];
+            if (RAW_EQUIPMENT_MAP[entry]) return RAW_EQUIPMENT_MAP[entry];
+            return [slugEquipment(entry)];
+        });
+    const deduped = unique(normalized);
+    return deduped.length ? deduped : (defaultNone ? ['none'] : []);
+};
+
+const isExerciseObject = (data: unknown): data is Record<string, any> =>
+    !!data && typeof data === 'object' && !Array.isArray(data) && typeof (data as any).name === 'string';
+
 // --- Schemas ---
 const GeneratePlanRequestSchema = z.object({
     userId: z.string().min(1).optional(),
@@ -248,48 +360,108 @@ app.post('/generate-plan', async (req: Request, res: Response): Promise<any> => 
         const planStartDate = new Date();
         planStartDate.setDate(planStartDate.getDate() + (weekOffset * 7));
 
-        const equipmentList: string[] = equipment && equipment.length > 0 ? equipment : [];
-        let equipmentDescription = "";
-
-        if (equipmentList.includes('gym')) {
-            equipmentDescription = "The user has access to a full Commercial Gym.";
-        } else if (equipmentList.length === 0) {
-            equipmentDescription = "The user has NO equipment — prescribe bodyweight-only exercises.";
-        } else {
-            equipmentDescription = `The user has access to: ${equipmentList.join(', ')}. Include standard bodyweight exercises as standard.`;
+        let profileEquipment: string[] = [];
+        try {
+            const profileRecords = await pb.collection('profiles_db').getList(1, 1, {
+                filter: `user = "${userId}"`,
+                fields: 'equipment_available',
+            });
+            const profile = profileRecords.items[0] as any;
+            if (Array.isArray(profile?.equipment_available)) {
+                profileEquipment = profile.equipment_available;
+            }
+        } catch {
+            profileEquipment = [];
         }
 
-        // 1. Fetch the master list of cached exercise names
+        const requestedEquipment = normalizeUserEquipment(equipment || [], { defaultNone: false });
+        const savedEquipment = normalizeUserEquipment(profileEquipment);
+        const effectiveEquipment = requestedEquipment.length ? requestedEquipment : savedEquipment;
+
+        let equipmentDescription = '';
+        if (effectiveEquipment.includes('gym')) {
+            equipmentDescription = 'The user has access to a full commercial gym. You can use any standard gym equipment.';
+        } else if (effectiveEquipment.length === 1 && effectiveEquipment[0] === 'none') {
+            equipmentDescription = 'The user has NO equipment. Prescribe bodyweight/no-equipment exercises only.';
+        } else {
+            equipmentDescription = `The user has access to: ${effectiveEquipment.join(', ')}. Only prescribe exercises that match this equipment set (plus none/bodyweight).`;
+        }
+
+        const allowedEquipment = effectiveEquipment.includes('gym')
+            ? null
+            : new Set([
+                ...effectiveEquipment,
+                ...(effectiveEquipment.includes('none') ? [] : ['none']),
+            ]);
+
+        // 1. Fetch equipment-scoped exercise pool and include metadata for better planning quality.
         let validExercises: string[] = [];
+        let validExerciseCatalog: string[] = [];
         try {
             const cacheRecords = await pb.collection('exercise_cache_db').getFullList({
-                fields: 'name'
+                fields: 'name,data',
             });
-            // The name field in DB currently stores `name:${actualName}` or similar, let's just clean it up 
-            // if we prefixed it "name:..." in the cache script. 
-            // The cache script we wrote uses `name: "name:jump rope"`
-            validExercises = cacheRecords.map((r: any) => r.name.replace(/^name:/, '').trim());
+            const filtered = cacheRecords
+                .map((record: any) => record?.data)
+                .filter(isExerciseObject)
+                .filter((exercise) => {
+                    if (!allowedEquipment) return true;
+                    const equipmentTokens = normalizeExerciseEquipment(exercise.equipment);
+                    return equipmentTokens.some((token) => allowedEquipment.has(token));
+                });
+
+            validExercises = unique(
+                filtered
+                    .map((exercise) => String(exercise.name || '').trim())
+                    .filter(Boolean),
+            ).slice(0, 600);
+
+            validExerciseCatalog = filtered
+                .slice(0, 600)
+                .map((exercise: any) => {
+                    const name = String(exercise.name || '').trim();
+                    const movement = String(exercise.movement_pattern || 'general');
+                    const intensity = String(exercise.intensity_level || 'moderate');
+                    const impact = String(exercise.impact_level || 'low_impact');
+                    const goal = String(exercise.training_goal || 'strength');
+                    const unilateral = exercise.is_unilateral ? 'unilateral' : 'bilateral';
+                    const category = String(exercise.category || 'strength');
+                    const equipmentType = String(exercise.equipment_type || primaryEquipmentType(normalizeExerciseEquipment(exercise.equipment)));
+                    if (!name) return '';
+                    return `${name} | equipment:${equipmentType} | category:${category} | movement:${movement} | intensity:${intensity} | impact:${impact} | side:${unilateral} | goal:${goal}`;
+                })
+                .filter(Boolean);
         } catch (e) {
-            console.error("Failed to fetch exercise whitelist from cache", e);
+            console.error('Failed to fetch equipment-scoped exercise whitelist from cache', e);
         }
 
         const validExercisesListStr = validExercises.length > 0
             ? validExercises.join(', ')
             : 'Generic exercises (e.g., push-up, squat, jump rope)';
+        const validExerciseCatalogStr = validExerciseCatalog.length > 0
+            ? validExerciseCatalog.join('\n')
+            : 'No metadata catalog available';
 
         const aiPrompt = `You are an elite AI fitness coach.
 Generate a highly personalized ${weekOffset > 0 ? `Week ${weekOffset + 1}` : '7-day'} workout and nutrition plan for a user.
 User Profile:
 - Current Weight: ${currentWeight} kg
 - Goal Weight: ${goalWeight} kg
-- Available Equipment: ${equipment && equipment.length > 0 ? equipment.join(', ') : 'None'}
+- Available Equipment: ${effectiveEquipment.join(', ')}
 - Phase: Week ${weekOffset + 1}
 CRITICAL CONSTRAINTS:
 1. NUTRITION: Calculate a safe, progressive daily calorie deficit target.
 2. EQUIPMENT: ${equipmentDescription}
 3. EXERCISE DICTIONARY SELECTION: You MUST ONLY select and prescribe exercises that exist in the following verified list. Do NOT invent exercises, use variations, or prescribe anything not on this comma-separated list:
 [ ${validExercisesListStr} ]
-4. SCHEDULE: Generate exactly 7 days.
+4. METADATA-AWARE PROGRAMMING: Use the exercise metadata catalog below to balance movement patterns and intensity across the week.
+- Rotate movement patterns (e.g., squat/push/pull/lunge/core/cardio) and avoid repeating the same primary pattern on consecutive workout days.
+- Mix intensity and impact intelligently (high days followed by moderate/low days).
+- Prefer bilateral + unilateral variety.
+- Keep choices aligned with the user's equipment.
+EXERCISE METADATA CATALOG (name | equipment | category | movement | intensity | impact | side | goal):
+${validExerciseCatalogStr}
+5. SCHEDULE: Generate exactly 7 days.
 Based on this, generate the optimal 7-day weight loss plan.`;
 
         if (!process.env.ANTHROPIC_API_KEY) {
@@ -447,15 +619,28 @@ async function getCached(pb: any, key: string) {
 }
 
 async function setCache(pb: any, key: string, data: unknown) {
+    if (Array.isArray(data)) return;
     try {
         await pb.collection('exercise_cache_db').create({ name: key, data });
     } catch (_) { }
 }
 
+const withEquipmentMetadata = (exercise: any) => {
+    const equipmentList = normalizeExerciseEquipment(exercise?.equipment);
+    return {
+        ...exercise,
+        equipment_type: primaryEquipmentType(equipmentList),
+        equipment_list: equipmentList,
+        gifUrl: exercise?.gifUrl || `/api/exercise-gif?id=${exercise?.id}`,
+    };
+};
+
 app.get('/exercises', async (req: Request, res: Response): Promise<any> => {
     try {
         const name = (req.query.name as string)?.toLowerCase().trim();
         const target = (req.query.target as string)?.toLowerCase().trim();
+        const equipmentFilterRaw = (req.query.equipment as string)?.toLowerCase().trim();
+        const equipmentFilter = equipmentFilterRaw ? normalizeUserEquipment([equipmentFilterRaw], { defaultNone: false })[0] : '';
         const limit = Number(req.query.limit || 10);
 
         const pb = await getAdminPB();
@@ -469,27 +654,40 @@ app.get('/exercises', async (req: Request, res: Response): Promise<any> => {
                 return res.status(404).json({ error: 'Not found' });
 
             const best = results.find((e: any) => e.name === name) || results[0];
-            if (best && !best.gifUrl) best.gifUrl = `/api/exercise-gif?id=${best.id}`;
+            const enriched = withEquipmentMetadata(best);
 
-            await setCache(pb, `name:${name}`, best);
-            return res.json(best);
+            await setCache(pb, `name:${name}`, enriched);
+            return res.json(enriched);
         }
 
         if (target) {
-            const cacheKey = `target:${target}:${limit}`;
-            const cached = await getCached(pb, cacheKey);
-            if (cached) return res.json(cached);
+            const cacheRecords = await pb.collection('exercise_cache_db').getFullList({
+                fields: 'data',
+            });
 
-            const raw = await rapidFetch(`/exercises/target/${encodeURIComponent(target)}?limit=${limit}`);
+            const fromCache = cacheRecords
+                .map((record: any) => record?.data)
+                .filter(isExerciseObject)
+                .map(withEquipmentMetadata)
+                .filter((exercise: any) => String(exercise.target || '').toLowerCase() === target)
+                .filter((exercise: any) => {
+                    if (!equipmentFilter) return true;
+                    const eqList = Array.isArray(exercise.equipment_list) ? exercise.equipment_list : [];
+                    return eqList.includes(equipmentFilter);
+                })
+                .slice(0, limit);
 
-            // Ensure we map and cast correctly to access gifUrl
-            const mappedResults = Array.isArray(raw) ? raw.map((e: any) => ({
-                ...e,
-                gifUrl: e.gifUrl || `/api/exercise-gif?id=${e.id}`,
-            })) : raw;
+            if (fromCache.length > 0) {
+                return res.json(fromCache);
+            }
 
-            await setCache(pb, cacheKey, mappedResults);
-            return res.json(mappedResults);
+            const raw = await rapidFetch(`/exercises/target/${encodeURIComponent(target)}?limit=${limit * 3}`);
+            const mappedResults = Array.isArray(raw) ? raw.map(withEquipmentMetadata) : [];
+            const filtered = mappedResults
+                .filter((exercise: any) => !equipmentFilter || exercise.equipment_list?.includes(equipmentFilter))
+                .slice(0, limit);
+
+            return res.json(filtered);
         }
 
         return res.status(400).json({ error: 'Provide ?name= or ?target=' });

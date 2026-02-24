@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Target, Droplet, Plus, MoreHorizontal, CheckCircle2, Circle, Loader2, Bell, Clock, Calendar, ArrowDown, RotateCcw, Crown, X } from 'lucide-react';
 import Image from 'next/image';
 import { useAuth } from '@/lib/auth';
@@ -13,6 +14,7 @@ const GUIDED_COMPLETION_TAG = '[guided_plan:today_completed]';
 
 export default function DashboardPage() {
     const { user } = useAuth();
+    const pathname = usePathname();
     const [profile, setProfile] = useState<any>(null);
     const [waterMl, setWaterMl] = useState(0);
     const [hydrationRecordId, setHydrationRecordId] = useState<string | null>(null);
@@ -65,6 +67,23 @@ export default function DashboardPage() {
         setNoticeTitle(title);
         setNoticeMessage(message);
         setIsNoticeOpen(true);
+    };
+    const getEquipmentForPlan = (profileLike: any): string[] => {
+        if (Array.isArray(profileLike?.equipment_available) && profileLike.equipment_available.length > 0) {
+            return profileLike.equipment_available;
+        }
+        if (typeof window !== 'undefined') {
+            try {
+                const stored = localStorage.getItem('momentum_equipment');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+                }
+            } catch {
+                // ignore malformed local data and fall back to "none"
+            }
+        }
+        return ['none'];
     };
 
     // Progress Calculation
@@ -228,7 +247,8 @@ export default function DashboardPage() {
                                 body: JSON.stringify({
                                     userId: user.id,
                                     currentWeight: userProfile.current_weight,
-                                    goalWeight: userProfile.goal_weight
+                                    goalWeight: userProfile.goal_weight,
+                                    equipment: getEquipmentForPlan(userProfile),
                                 })
                             });
                             if (res.ok) {
@@ -311,7 +331,7 @@ export default function DashboardPage() {
         };
 
         fetchUserData();
-    }, [user]);
+    }, [user, pathname]);
 
     // Re-fetch hydration & nutrition when user taps a different date
     useEffect(() => {
@@ -379,6 +399,7 @@ export default function DashboardPage() {
                     userId: user.id,
                     currentWeight: profile.current_weight,
                     goalWeight: profile.goal_weight,
+                    equipment: getEquipmentForPlan(profile),
                     refreshRequested: true,
                 })
             });
@@ -427,6 +448,7 @@ export default function DashboardPage() {
                         userId: user.id,
                         currentWeight: profile.current_weight,
                         goalWeight: profile.goal_weight,
+                        equipment: getEquipmentForPlan(profile),
                         weekOffset: i,
                     })
                 });

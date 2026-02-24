@@ -19,6 +19,63 @@ if (!EXERCIEDB_API_KEY) {
 
 const pb = new PocketBase(PB_URL);
 
+const RAW_EQUIPMENT_MAP: Record<string, string[]> = {
+    'body weight': ['none'],
+    bodyweight: ['none'],
+    dumbbell: ['dumbbell'],
+    'dumbbell (used as handles for deeper range)': ['dumbbell'],
+    'dumbbell, exercise ball': ['dumbbell', 'exercise_ball'],
+    barbell: ['barbell'],
+    'ez barbell': ['ez_barbell'],
+    'ez barbell, exercise ball': ['ez_barbell', 'exercise_ball'],
+    'olympic barbell': ['barbell'],
+    'trap bar': ['trap_bar'],
+    cable: ['cable'],
+    'leverage machine': ['machine'],
+    'smith machine': ['smith_machine'],
+    'sled machine': ['sled'],
+    kettlebell: ['kettlebell'],
+    band: ['band'],
+    'resistance band': ['band'],
+    'body weight (with resistance band)': ['band'],
+    rope: ['jump_rope'],
+    'jump rope': ['jump_rope'],
+    'stability ball': ['stability_ball'],
+    'exercise ball': ['exercise_ball'],
+    'medicine ball': ['medicine_ball'],
+    'bosu ball': ['bosu_ball'],
+    assisted: ['assisted'],
+    'assisted (towel)': ['assisted'],
+    roller: ['roller'],
+    'wheel roller': ['ab_wheel'],
+    hammer: ['hammer'],
+    'stationary bike': ['stationary_bike'],
+    'upper body ergometer': ['ergometer'],
+    'elliptical machine': ['elliptical'],
+    'stepmill machine': ['stepmill'],
+    weighted: ['weighted'],
+};
+
+const unique = (items: string[]): string[] => Array.from(new Set(items.filter(Boolean)));
+
+const normalizeEquipment = (rawValue: unknown): string[] => {
+    if (typeof rawValue !== 'string' || !rawValue.trim()) return ['none'];
+    const raw = rawValue.toLowerCase().trim();
+    if (RAW_EQUIPMENT_MAP[raw]) return unique(RAW_EQUIPMENT_MAP[raw]);
+
+    const parts = raw.split(',').map((part) => part.trim()).filter(Boolean);
+    const mapped = parts.flatMap((part) => RAW_EQUIPMENT_MAP[part] || [part.replace(/\s+/g, '_')]);
+    const result = unique(mapped);
+    return result.length ? result : ['none'];
+};
+
+const primaryEquipmentType = (equipmentList: string[]): string => {
+    const first = equipmentList[0] || 'none';
+    if (!equipmentList.length) return 'none';
+    if (equipmentList.length === 1) return first;
+    return equipmentList.find((eq) => eq !== 'none') || first;
+};
+
 async function authenticateAdmin() {
     console.log(`Authenticating admin at ${PB_URL}...`);
     try {
@@ -67,19 +124,25 @@ async function fetchExercises(offset: number, limit: number): Promise<any[]> {
 
 async function saveToPocketBase(exercise: any) {
     const cacheKey = `name:${exercise.name.toLowerCase()}`;
+    const equipmentList = normalizeEquipment(exercise?.equipment);
+    const payload = {
+        ...exercise,
+        equipment_type: primaryEquipmentType(equipmentList),
+        equipment_list: equipmentList,
+    };
     try {
         // Try to update existing first to avoid duplicates
         try {
             const existing = await pb.collection('exercise_cache_db').getFirstListItem(`name="${cacheKey}"`);
             await pb.collection('exercise_cache_db').update(existing.id, {
-                data: exercise
+                data: payload
             });
             return { status: 'updated' };
         } catch (e) {
             // Not found, create new
             await pb.collection('exercise_cache_db').create({
                 name: cacheKey,
-                data: exercise
+                data: payload
             });
             return { status: 'created' };
         }

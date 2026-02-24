@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { getPB } from "@/lib/pb";
@@ -7,13 +7,14 @@ import { MoveRight, Loader2, Target, Weight, Ruler, Dumbbell, CheckCircle2, Lock
 import { useAuth } from "@/lib/auth";
 
 const EQUIPMENT_OPTIONS = [
-    { id: "jump_rope", label: "Jump Rope", emoji: "〰️" },
-    { id: "dumbbells", label: "Dumbbells", emoji: "🏋️" },
-    { id: "resistance_bands", label: "Resistance Bands", emoji: "🎽" },
-    { id: "pull_up_bar", label: "Pull-up Bar", emoji: "🔩" },
-    { id: "kettlebell", label: "Kettlebell", emoji: "⚫" },
-    { id: "gym", label: "Commercial Gym", emoji: "🏢" },
-    { id: "none", label: "Home Workout", emoji: "🤸" },
+    { id: "none", label: "No Equipment", emoji: "Home" },
+    { id: "jump_rope", label: "Jump Rope", emoji: "Rope" },
+    { id: "treadmill", label: "Treadmill", emoji: "Run" },
+    { id: "dumbbell", label: "Dumbbell", emoji: "DB" },
+    { id: "band", label: "Resistance Band", emoji: "Band" },
+    { id: "pull_up_bar", label: "Pull-up Bar", emoji: "Bar" },
+    { id: "kettlebell", label: "Kettlebell", emoji: "KB" },
+    { id: "gym", label: "Commercial Gym", emoji: "Gym" },
 ];
 
 const TOTAL_STEPS = 4;
@@ -39,11 +40,13 @@ export default function OnboardingPage() {
 
     const toggleEquipment = (id: string) => {
         setSelectedEquipment(prev => {
-            // "gym" is exclusive 
+            // "gym" is exclusive
             if (id === "gym") return prev.includes("gym") ? [] : ["gym"];
-            // Selecting any home equipment clears "gym"
-            const withoutGym = prev.filter(e => e !== "gym");
-            return withoutGym.includes(id) ? withoutGym.filter(e => e !== id) : [...withoutGym, id];
+            // "none" is exclusive with all equipment options
+            if (id === "none") return prev.includes("none") ? [] : ["none"];
+            // Selecting specific equipment clears "gym" and "none"
+            const filtered = prev.filter(e => e !== "gym" && e !== "none");
+            return filtered.includes(id) ? filtered.filter(e => e !== id) : [...filtered, id];
         });
     };
 
@@ -59,6 +62,7 @@ export default function OnboardingPage() {
 
         try {
             const pb = getPB();
+            const equipmentToSave = selectedEquipment.length > 0 ? selectedEquipment : ["none"];
 
             // 1. Save/update the user's profile
             setLoadingMsg("Saving your profile...");
@@ -67,19 +71,41 @@ export default function OnboardingPage() {
             });
 
             if (profiles.length > 0) {
-                await pb.collection("profiles_db").update(profiles[0].id, {
+                const payload = {
                     current_weight: parseFloat(currentWeight),
                     goal_weight: parseFloat(goalWeight),
                     height: parseFloat(height),
-                });
+                    equipment_available: equipmentToSave,
+                };
+                try {
+                    await pb.collection("profiles_db").update(profiles[0].id, payload);
+                } catch {
+                    await pb.collection("profiles_db").update(profiles[0].id, {
+                        current_weight: payload.current_weight,
+                        goal_weight: payload.goal_weight,
+                        height: payload.height,
+                    });
+                }
             } else {
-                await pb.collection("profiles_db").create({
+                const payload = {
                     user: user.id,
                     current_weight: parseFloat(currentWeight),
                     goal_weight: parseFloat(goalWeight),
                     height: parseFloat(height),
-                });
+                    equipment_available: equipmentToSave,
+                };
+                try {
+                    await pb.collection("profiles_db").create(payload);
+                } catch {
+                    await pb.collection("profiles_db").create({
+                        user: payload.user,
+                        current_weight: payload.current_weight,
+                        goal_weight: payload.goal_weight,
+                        height: payload.height,
+                    });
+                }
             }
+            localStorage.setItem('momentum_equipment', JSON.stringify(equipmentToSave));
 
             // 2. Determine how many weeks to generate (Free = 1 week, Premium = 4 weeks)
             let isPremium = false;
@@ -114,7 +140,7 @@ export default function OnboardingPage() {
                         userId: user.id,
                         currentWeight: parseFloat(currentWeight),
                         goalWeight: parseFloat(goalWeight),
-                        equipment: selectedEquipment,
+                        equipment: equipmentToSave,
                         weekOffset: i, // <--- Tells API to shift start_date logic
                     }),
                 });
@@ -167,7 +193,7 @@ export default function OnboardingPage() {
                 {isSuccess && (
                     <div className="flex-1 flex flex-col items-center justify-center gap-6 animate-in zoom-in-95 duration-500 text-center">
                         <div className="w-24 h-24 bg-[#18A058]/10 rounded-full flex items-center justify-center mb-4">
-                            <span className="text-5xl">🎉</span>
+                            <span className="text-5xl">ðŸŽ‰</span>
                         </div>
                         <div>
                             <h1 className="text-3xl font-black text-slate-900 mb-4">You're all set!</h1>
@@ -387,3 +413,4 @@ export default function OnboardingPage() {
         </div>
     );
 }
+

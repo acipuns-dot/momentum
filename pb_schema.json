@@ -96,6 +96,16 @@
                     "max": 250,
                     "noDecimal": false
                 }
+            },
+            {
+                "name": "equipment_available",
+                "type": "json",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "maxSize": 1000000
+                }
             }
         ],
         "indexes": [],
