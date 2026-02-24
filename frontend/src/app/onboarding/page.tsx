@@ -7,14 +7,14 @@ import { MoveRight, Loader2, Target, Weight, Ruler, Dumbbell, CheckCircle2, Lock
 import { useAuth } from "@/lib/auth";
 
 const EQUIPMENT_OPTIONS = [
-    { id: "none", label: "No Equipment", emoji: "Home" },
-    { id: "jump_rope", label: "Jump Rope", emoji: "Rope" },
-    { id: "treadmill", label: "Treadmill", emoji: "Run" },
-    { id: "dumbbell", label: "Dumbbell", emoji: "DB" },
-    { id: "band", label: "Resistance Band", emoji: "Band" },
-    { id: "pull_up_bar", label: "Pull-up Bar", emoji: "Bar" },
-    { id: "kettlebell", label: "Kettlebell", emoji: "KB" },
-    { id: "gym", label: "Commercial Gym", emoji: "Gym" },
+    { id: "none", label: "No Equipment", badge: "None" },
+    { id: "jump_rope", label: "Jump Rope", badge: "Rope" },
+    { id: "treadmill", label: "Treadmill", badge: "Run" },
+    { id: "dumbbell", label: "Dumbbell", badge: "DB" },
+    { id: "band", label: "Resistance Band", badge: "Band" },
+    { id: "pull_up_bar", label: "Pull-up Bar", badge: "Bar" },
+    { id: "kettlebell", label: "Kettlebell", badge: "KB" },
+    { id: "gym", label: "Commercial Gym", badge: "Gym" },
 ];
 
 const TOTAL_STEPS = 4;
@@ -171,17 +171,17 @@ export default function OnboardingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col font-sans relative overflow-hidden">
+        <div className="min-h-screen momentum-bg dot-grid-subtle momentum-dark flex flex-col font-sans relative overflow-hidden">
 
             {/* Progress Bar */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-slate-200">
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-slate-800/70">
                 <div
                     className="h-full bg-[#18A058] transition-all duration-500 ease-out"
                     style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
                 />
             </div>
 
-            <div className="flex-1 flex flex-col max-w-md w-full mx-auto px-6 pt-20 pb-12 relative z-10">
+            <div className="ui-page flex-1 flex flex-col max-w-md w-full mx-auto px-6 pt-20 pb-12 relative z-10">
 
                 {error && (
                     <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl font-medium text-center mb-6">
@@ -192,8 +192,8 @@ export default function OnboardingPage() {
                 {/* Success Screen */}
                 {isSuccess && (
                     <div className="flex-1 flex flex-col items-center justify-center gap-6 animate-in zoom-in-95 duration-500 text-center">
-                        <div className="w-24 h-24 bg-[#18A058]/10 rounded-full flex items-center justify-center mb-4">
-                            <span className="text-5xl">ðŸŽ‰</span>
+                        <div className="w-24 h-24 bg-[#18A058]/10 rounded-full flex items-center justify-center mb-4 border border-emerald-400/30">
+                            <span className="text-sm font-black tracking-wider text-emerald-300">READY</span>
                         </div>
                         <div>
                             <h1 className="text-3xl font-black text-slate-900 mb-4">You're all set!</h1>
@@ -374,21 +374,24 @@ export default function OnboardingPage() {
                                         key={opt.id}
                                         type="button"
                                         onClick={() => toggleEquipment(opt.id)}
-                                        className={`relative flex flex-col items-center gap-2 p-4 rounded-2xl border-2 font-semibold text-sm transition-all active:scale-95
+                                        className={`relative flex flex-col items-center gap-2 p-4 rounded-2xl border-2 font-semibold text-sm transition-all active:scale-95 ui-card
                                             ${selected
-                                                ? "bg-[#18A058]/10 border-[#18A058] text-[#18A058]"
-                                                : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                                ? "surface-emerald border-[#18A058] text-emerald-300"
+                                                : "ui-glass border-slate-200 text-slate-300 hover:border-slate-300"
                                             }`}
                                     >
                                         {selected && (
                                             <CheckCircle2 size={16} className="absolute top-2 right-2 text-[#18A058]" />
                                         )}
-                                        <span className="text-2xl">{opt.emoji}</span>
+                                        <span className="text-[11px] font-black uppercase tracking-wider px-2 py-1 rounded-full bg-slate-800/80 border border-slate-600 text-slate-200">
+                                            {opt.badge}
+                                        </span>
                                         {opt.label}
                                     </button>
                                 );
                             })}
                         </div>
+                        <p className="text-xs text-slate-400 mt-3">Tip: choose <span className="font-bold text-slate-300">No Equipment</span> for bodyweight-only plans.</p>
 
                         <div className="mt-auto pt-8 flex gap-3">
                             <button onClick={handleBack} className="w-1/3 bg-slate-200 text-slate-600 font-bold text-lg rounded-2xl px-4 py-5 hover:bg-slate-300 active:scale-[0.98] transition-all">
